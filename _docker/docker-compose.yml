@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        restart: unless-stopped
+        tty: true
+        volumes:
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+            - ../:/var/www
+        networks:
+            - app-network
+        ports:
+            - "80:80"
+        depends_on:
+            - php
+
+    php:
+        build:
+            context: .
+            dockerfile: php/Dockerfile
+        container_name: php
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "9000:9000"
+        volumes:
+            - ../:/var/www
+        depends_on:
+            - mysql
+        networks:
+            - app-network
+
+#    vault:
+#        image: vault:1.13.3
+#        container_name: vault
+#        restart: unless-stopped
+#        ports:
+#            - "8200:8200"
+#        environment:
+#            VAULT_DEV_ROOT_TOKEN_ID: root
+#            VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+#            VAULT_ADDR: http://0.0.0.0:8200
+#        cap_add:
+#            - IPC_LOCK
+#        volumes:
+#            - vault-data:/vault/data
+#        networks:
+#            - app-network
+#        command: server -dev
+
+    mysql:
+        image: mysql:8.0
+        restart: always
+        container_name: mysql
+        volumes:
+            - mysql-data:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: univex
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "3306:3306"
+        command: [
+            "mysqld",
+            "--character-set-server=utf8",
+            "--collation-server=utf8_unicode_ci",
+            "--innodb-ft-min-token-size=1"
+        ]
+        networks:
+            - app-network
+
+    minio:
+        image: minio/minio:latest
+        container_name: minio
+        restart: always
+        ports:
+            - "3377:9000"
+            - "3388:9001"
+        command: server /data --console-address ":9001"
+        environment:
+            MINIO_ROOT_USER: minio
+            MINIO_ROOT_PASSWORD: rootroot
+        volumes:
+            - minio-univex:/data
+        networks:
+            - app-network
+
+    phpmyadmin:
+        image: phpmyadmin:latest
+        container_name: pma
+        ports:
+            - "8877:80"
+        environment:
+            PMA_HOST: "89.253.237.41"
+            PMA_PORT: "3310"
+            UPLOAD_MAX_FILESIZE: 512M
+            POST_MAX_SIZE: 512M
+            MAX_EXECUTION_TIME: 3000
+        networks:
+            - app-network
+
+    phpmyadmin1:
+        image: phpmyadmin:latest
+        container_name: pma1
+        ports:
+            - "8876:80"
+        environment:
+            PMA_HOST: mysql
+            UPLOAD_MAX_FILESIZE: 512M
+            POST_MAX_SIZE: 512M
+            MAX_EXECUTION_TIME: 3000
+        depends_on:
+            - mysql
+        networks:
+            - app-network
+
+    redis:
+        image: redis:latest
+        restart: always
+        ports:
+            - "6379:6379"
+        networks:
+            - app-network
+
+volumes:
+    mysql-data:
+    minio-univex:
+#    vault-data:
+
+networks:
+    app-network:
+        driver: bridge
