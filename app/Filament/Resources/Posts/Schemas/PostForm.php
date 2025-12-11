@@ -11,6 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -52,19 +53,34 @@ class PostForm
                                     ->placeholder('url-adres-posta')
                                     ->helperText('Уникальный идентификатор для URL'),
 
-//                                AdvancedFileUpload::make('file')
-//                                    ->pdfToolbar(true)
-//                                    ->label('Upload PDF')
-//                                    ->pdfPreviewHeight(400) // Customize preview height
-//                                    ->pdfDisplayPage(1) // Set default page
-//                                    ->pdfToolbar(true) // Enable toolbar
-//                                    ->pdfZoomLevel(100) // Set zoom level
-//                                    ->pdfFitType(PdfViewFit::FIT) // Set fit type
-//                                    ->pdfNavPanes(true), // Enable navigation panes,
-
                                 RichEditor::make('content')
                                     ->label('Содержание')
                                     ->required()
+                                    ->reactive()
+                                    ->debounce(50)
+                                    ->afterStateUpdated(function (RichEditor $component, $state, $set) {
+                                        $count = 0;
+                                        $modifiedState = preg_replace_callback(
+                                            '/<img[^>]+src="([^"]*\.(?:pdf|docx?|xlsx?|pptx?|txt|csv|zip|rar|json|xml)[^"]*)"[^>]*>/i',
+                                            function ($matches) use (&$count) {
+                                                $count++;
+                                                $url = $matches[1];
+
+                                                $filename = basename($url);
+
+                                                $cleanName = pathinfo($filename, PATHINFO_FILENAME);
+
+                                                $fileSize = self::getFileSize($filename);
+
+                                                return '<a href="' . $url . '" target="_blank"> 📄  файл ' . $fileSize . '</a>';
+                                            },
+                                            $state);
+
+                                        if ($count > 0) {
+                                            $set('file', 1);
+                                            $component->state($modifiedState);
+                                        }
+                                    })
                                     ->fileAttachmentsDisk('documents')
                                     ->fileAttachmentsDirectory('posts')
                                     ->fileAttachmentsVisibility('public')
@@ -75,6 +91,21 @@ class PostForm
                                         'image/gif',
                                         'image/webp',
                                         'image/svg+xml',
+
+                                        // Документы (добавьте нужные)
+                                        'application/pdf',
+                                        'application/msword',
+                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                        'application/vnd.ms-excel',
+                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                        'application/vnd.ms-powerpoint',
+                                        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                        'text/plain',
+                                        'text/csv',
+                                        'application/zip',
+                                        'application/x-rar-compressed',
+                                        'application/json',
+                                        'application/xml',
                                     ])
                                     ->extraInputAttributes(['style' => 'min-height: 200px;'])
                                     ->toolbarButtons([
@@ -83,44 +114,6 @@ class PostForm
                                         ['blockquote', 'codeBlock', 'bulletList', 'orderedList'],
                                         ['table', 'attachFiles'],
                                         ['undo', 'redo'],
-                                    ])
-                                    ->columnSpanFull(),
-
-                                FileUpload::make('attachments')
-                                    ->label('Прикрепленные файлы')
-                                    ->disk('documents')
-                                    ->directory('posts')
-                                    ->visibility('public')
-                                    ->multiple()
-                                    ->downloadable()
-                                    ->acceptedFileTypes([
-                                        'image/jpeg',
-                                        'image/png',
-                                        'image/gif',
-                                        'image/webp',
-                                        'image/svg+xml',
-
-                                        // Документы
-                                        'application/pdf',
-                                        'application/msword', // .doc
-                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-                                        'application/vnd.ms-excel', // .xls
-                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-                                        'application/vnd.ms-powerpoint', // .ppt
-                                        'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-
-                                        // Текстовые файлы
-                                        'text/plain',
-                                        'text/csv',
-
-                                        // Архивы
-                                        'application/zip',
-                                        'application/x-rar-compressed',
-                                        'application/x-7z-compressed',
-
-                                        // Другие
-                                        'application/json',
-                                        'application/xml',
                                     ])
                                     ->columnSpanFull(),
                             ])
@@ -139,11 +132,11 @@ class PostForm
                                     ->inline(false)
                                     ->helperText('Включите для публикации поста'),
 
-                                DateTimePicker::make('published_at')
+                                DateTimePicker::make('starts_at')
                                     ->label('Дата публикации')
-                                    ->default(now())
                                     ->displayFormat('d.m.Y H:i')
-                                    ->helperText('Когда пост станет доступен для просмотра'),
+                                    ->timezone('Europe/Moscow')
+                                    ->helperText('Когда пост станет доступен для просмотра. Оставьте пустым, если пост доступен сразу'),
 
                                 FileUpload::make('image')
                                     ->label('Главное изображение')
@@ -172,5 +165,30 @@ class PostForm
                     ])
                     ->columns(3),
             ]);
+    }
+
+    private static function getFileSize($fileName)
+    {
+//        dd($fileName);
+        try {
+            $path = public_path(parse_url($fileName, PHP_URL_PATH));
+            if (file_exists($path)) {
+                $size = filesize($path);
+                return self::formatBytes($size);
+            }
+        } catch (\Exception $e) {
+            return '';
+        }
+
+        return '';
+    }
+
+    private static function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
     }
 }

@@ -112,6 +112,7 @@ class EmployeesTable
                         })
                         ->deselectRecordsAfterCompletion(),
                 ]),
-            ]);
+            ])
+            ->deferLoading();
     }
 }

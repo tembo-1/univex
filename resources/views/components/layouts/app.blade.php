@@ -88,6 +88,112 @@
             opacity: 0;
             visibility: hidden;
         }
+
+        .notifications-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            max-width: 350px;
+        }
+
+        .notification-footer {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .notification-hide-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .notification-hide-btn:hover {
+            color: #333;
+            text-decoration: underline;
+        }
+
+        .notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.1);
+            overflow: hidden;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1998f2, #2ecc71);
+            transition: width 0.05s linear;
+            border-radius: 0 0 0 8px;
+        }
+
+        .notification-item {
+            background: white;
+            border-left: 4px solid #1998f2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 16px;
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .notification-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .notification-content {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
     </style>
 
     <!-- Vite для стилей и скриптов -->
@@ -106,19 +212,23 @@
     <div class="inner">
         <div class="wrapper">
             <!-- Header -->
-            @livewire('header')
+            @livewire('pages.header')
 
             <!-- Main Content -->
             <main class="page">
+                <div class="consent">
+                    <div class="consent__inner">
+                        <div class="consent__text">Мы используем файлы cookie, чтобы улучшить сайт для Вас</div>
+                        <button type="button" class="consent__btn btn">Согласен</button>
+                    </div>
+                </div>
                 {{ $slot }}
             </main>
-
             <!-- Footer -->
-            @livewire('footer')
+            @livewire('pages.footer')
         </div>
     </div>
 </div>
-
 
 <!-- Скрипт для скрытия preloader -->
 <script>
@@ -127,9 +237,24 @@
             document.getElementById('preloader').classList.add('hidden');
         }, 1000); // 1 секунда
     });
-</script>
 
+    document.addEventListener('livewire:init', () => {
+        Livewire.hook('request', ({ fail }) => {
+            fail(({ status, preventDefault }) => {
+                if (status === 419) {
+                    // Автоматическое обновление через 1 секунду
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+
+                    preventDefault();
+                }
+            });
+        });
+    });
+</script>
 @stack('scripts')
 @livewireScripts
+@livewire('notification-display')
 </body>
 </html>

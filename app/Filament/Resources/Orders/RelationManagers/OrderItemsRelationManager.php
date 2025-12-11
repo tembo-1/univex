@@ -14,8 +14,6 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
-use UnitEnum;
 
 class OrderItemsRelationManager extends RelationManager
 {
@@ -38,7 +36,7 @@ class OrderItemsRelationManager extends RelationManager
                     ->label('Наименование'),
                 TextColumn::make('warehouse.name')
                     ->label('Склад'),
-                TextColumn::make('unit_price')
+                TextColumn::make('unit_price_rub')
                     ->label('Цена')
                     ->money('RUB'),
                 TextColumn::make('quantity')
@@ -49,13 +47,28 @@ class OrderItemsRelationManager extends RelationManager
                     ->action(
                         EditAction::make()
                     ),
-                TextColumn::make('total_amount')
+                TextColumn::make('total_amount_rub')
                     ->label('Стоимость')
                     ->money('RUB'),
             ])
             ->headerActions([
                 CreateAction::make()
                     ->label('Добавить товар в заказ')
+                    ->disabled(function (CreateAction $action) {
+                        $livewire = $action->getLivewire();
+
+                        if (method_exists($livewire, 'getOwnerRecord')) {
+                            $order = $livewire->getOwnerRecord();
+
+                            return $order->orderStatus->slug == 'processed';
+                        }
+
+                        if (property_exists($livewire, 'ownerRecord') && $livewire->ownerRecord) {
+                            return $livewire->ownerRecord->orderStatus->slug == 'processed';
+                        }
+
+                        return false;
+                    })
                     ->modalHeading('Добавить товар в заказ')
                     ->after(function () {
                         redirect(request()->header('Referer'));
@@ -63,10 +76,22 @@ class OrderItemsRelationManager extends RelationManager
             ])
             ->recordActions([
                 DeleteAction::make()
+                    ->disabled(function ($record) {
+                        if ($record->order->orderStatus->slug == 'processed') {
+                            return true;
+                        }
+                        return false;
+                    })
                     ->after(function () {
                         redirect(request()->header('Referer'));
                     }),
                 EditAction::make()
+                    ->disabled(function ($record) {
+                        if ($record->order->orderStatus->slug == 'processed') {
+                            return true;
+                        }
+                        return false;
+                    })
                     ->after(function () {
                         redirect(request()->header('Referer'));
                     }),

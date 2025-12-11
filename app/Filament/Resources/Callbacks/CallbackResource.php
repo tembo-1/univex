@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Callbacks;
 
-use App\Filament\Resources\Callbacks\Pages\CreateCallback;
-use App\Filament\Resources\Callbacks\Pages\EditCallback;
 use App\Filament\Resources\Callbacks\Pages\ListCallbacks;
 use App\Filament\Resources\Callbacks\Schemas\CallbackForm;
 use App\Filament\Resources\Callbacks\Tables\CallbacksTable;

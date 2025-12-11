@@ -98,8 +98,9 @@ class ManufacturerForm
                     ->schema([
                         FileUpload::make('image')
                             ->label('Изображение категории')
+                            ->disk('documents')
                             ->directory('categories')
-                            ->disk('public')
+                            ->visibility('public')
                             ->image()
                             ->imageEditor()
                             ->imageResizeMode('cover')
@@ -115,7 +116,6 @@ class ManufacturerForm
                             ->panelLayout('integrated')
                             ->removeUploadedFileButtonPosition('center')
                             ->uploadButtonPosition('center')
-                            ->storeFiles(false)
                             ->uploadProgressIndicatorPosition('center'),
 
 

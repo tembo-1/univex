@@ -51,6 +51,7 @@ class WareHousesTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->deferLoading();
     }
 }

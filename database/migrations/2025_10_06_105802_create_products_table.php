@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // description
-            $table->string('sku'); // no - артикул
-            $table->string('oem')->nullable(); // origNo - оригинальный номер
-            $table->text('search_text')->nullable(); // matchCode - для поиска
-            $table->boolean('on_sale')->default(false); // sale
-            $table->decimal('sale_discount', 5, 2)->default(0); // sDiscount
-            $table->integer('min_order_quantity')->default(1); // minQty
+            $table->string('name');
+            $table->string('sku');
+            $table->string('oem')->nullable();
+            $table->text('search_text')->nullable();
+            $table->boolean('on_sale')->default(false);
+            $table->decimal('sale_discount', 5, 2)->default(0);
+            $table->integer('min_order_quantity')->default(1);
 
             $table->foreignId('manufacturer_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('product_warehouse_status_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();

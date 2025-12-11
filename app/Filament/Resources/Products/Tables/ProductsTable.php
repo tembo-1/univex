@@ -47,6 +47,7 @@ class ProductsTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->deferLoading();
     }
 }

@@ -12,4 +12,19 @@ class ProductPrice extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function getPriceAttribute()
+    {
+        return $this->price / 100.0;
+    }
+
+    public function warehouseProducts()
+    {
+        return $this->hasMany(WarehouseProduct::class);
+    }
+
+    public function getDiscountAttribute()
+    {
+        return $this->discount / 100.0;
+    }
 }

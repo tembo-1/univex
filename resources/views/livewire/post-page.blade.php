@@ -1,12 +1,4 @@
 <style>
-    .content-reset {
-        all: initial;
-    }
-
-    .content-reset * {
-        all: revert;
-    }
-
     .content-reset table {
         width: 100%;
         border-collapse: collapse;

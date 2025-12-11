@@ -90,6 +90,7 @@ class PostsTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->deferLoading();
     }
 }

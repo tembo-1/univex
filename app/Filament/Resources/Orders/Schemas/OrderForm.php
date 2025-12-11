@@ -79,6 +79,7 @@ class OrderForm
                                                     ->label('Оплачен')
                                                     ->onColor('success')
                                                     ->offColor('danger')
+                                                    ->disabled()
                                                     ->onIcon('heroicon-o-check-circle')
                                                     ->offIcon('heroicon-o-x-circle')
                                                     ->inline(false),
@@ -88,9 +89,8 @@ class OrderForm
                                                         return OrderStatus::query()
                                                             ->pluck('name', 'id');
                                                     })
+                                                    ->disabled(fn () => !isAdmin())
                                                     ->label('Статус заказа')
-                                                    ->dehydrated(fn () => auth()->user()->hasRole('Администратор'))
-                                                    ->disabled(fn () => auth()->user()->hasRole('Администратор'))
                                                     ->placeholder('Неизвестный статус')
                                                     ->columnSpanFull(),
                                             ]),

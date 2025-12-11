@@ -3,83 +3,37 @@
         <div class="footer__inner">
             <div class="footer__content">
                 <div data-spollers="992, max" class="footer__spollers spollers">
-                    <details class="spollers__item">
-                        <summary class="spollers__title" style='--icon:url("/img/icons/04.svg")'>Каталог</summary>
-                        <div class="spollers__body">
-                            <div class="spollers__inner">
-                                <ul class="spollers__list">
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Онлайн каталог</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">PDF каталог</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </details>
-                    <details class="spollers__item">
-                        <summary class="spollers__title" style='--icon:url("/img/icons/04.svg")'>Клиентам</summary>
-                        <div class="spollers__body">
-                            <div class="spollers__inner">
-                                <ul class="spollers__list">
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Как стать клиентом</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Договора</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Претензии и возврат</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Доставка</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </details>
-                    <details class="spollers__item">
-                        <summary class="spollers__title" style='--icon:url("/img/icons/04.svg")'>О компании</summary>
-                        <div class="spollers__body">
-                            <div class="spollers__inner">
-                                <ul class="spollers__list">
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">ООО «АвтопартУнивекс»</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Реквизиты</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Вакансии</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Маркетинговые материалы</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </details>
-                    <details class="spollers__item">
-                        <summary class="spollers__title" style='--icon:url("/img/icons/04.svg")'>Поставщикам</summary>
-                        <div class="spollers__body">
-                            <div class="spollers__inner">
-                                <ul class="spollers__list">
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Как стать поставщиком</a>
-                                    </li>
-                                    <li class="spollers__page">
-                                        <a href="#" class="spollers__page-link">Претензии и возврат</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </details>
+                    @foreach($menus as $menu)
+                        @if(!$menu->menuItems->isEmpty())
+                            <details class="spollers__item">
+                                <summary class="spollers__title" style='--icon:url("/img/icons/04.svg")'>{{ $menu->name }}</summary>
+                                <div class="spollers__body">
+                                    <div class="spollers__inner">
+                                        <ul class="spollers__list">
+                                            @foreach($menu->menuItems as $menuItem)
+                                                @php
+                                                    try {
+                                                        $url = route($menuItem->sitePage->slug);
+                                                    } catch (\Exception $e) {
+                                                        $url = route('page', $menuItem->sitePage->slug);
+                                                    }
+                                                @endphp
+
+                                                <li class="spollers__page">
+                                                    <a href="{{ $url }}" class="spollers__page-link">{{ $menuItem->name }}</a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </details>
+                        @endif
+                    @endforeach
                 </div>
                 <div class="footer__bottom">
                     <div class="footer__bottom-info">
-                        <div class="footer__bottom-company" style='--icon:url("/img/icons/01.svg")'>2025 ООО «АвтопартУнивекс»</div>
-                        <a href="#" class="footer__bottom-policy">Политика конфиденциальности</a>
+                        <div class="footer__bottom-company" style='--icon:url("/img/icons/01.svg")'>{{ now()->year }} ООО «АвтопартУнивекс»</div>
+                        <a href="{{ $privacyPolicyUrl }}" class="footer__bottom-policy">Политика конфиденциальности</a>
                     </div>
                     <div class="footer__bottom-development">
                         <span>JW</span>
@@ -91,7 +45,7 @@
                 <div class="footer__info-items">
                     <div class="footer__info-item">
                         <div class="footer__info-connection">
-                            <a href="tel:+74957397210" class="footer__info-phone">+7 (495) 739-72-10</a>
+                            <a href="tel:{{ setting('site_phone') }}" class="footer__info-phone">{{ setting('site_phone') }}</a>
                             <div class="footer__info-socials">
                                 <a href="#" class="footer__info-social" style='--icon:url("/img/icons/012.svg")'></a>
                                 <a href="#" class="footer__info-social" style='--icon:url("/img/icons/02.svg")'></a>
@@ -100,27 +54,26 @@
                     </div>
                     <div class="footer__info-item">
                         <div class="footer__info-row">
-                            <a href="mailto:info@univex.ru" class="footer__info-column">info@univex.ru</a>
-                            <address class="footer__info-column">г. Москва, район Троицк,
-                                <br>
-                                Чароитовая улица, 5, стр. 49
+                            <a href="mailto:{{ setting('site_email') }}" class="footer__info-column">{{ setting('site_email') }}</a>
+                            <address class="footer__info-column">
+                                {{ setting('site_address') }}
                             </address>
                         </div>
                     </div>
                     <div class="footer__info-item">
                         <div class="footer__info-title">Мы в соцсетях:</div>
                         <div class="footer__info-links">
-                            <a href="#" class="footer__info-link">
+                            <a href="{{ setting('site_vk') }}" class="footer__info-link">
                                 <picture>
                                     <img src="/img/footer/01.webp" srcset="/img/footer/01@2x.webp 2x" alt="">
                                 </picture>
                             </a>
-                            <a href="#" class="footer__info-link">
+                            <a href="{{ setting('site_telegram') }}" class="footer__info-link">
                                 <picture>
                                     <img src="/img/footer/02.webp" srcset="/img/footer/02@2x.webp 2x" alt="">
                                 </picture>
                             </a>
-                            <a href="#" class="footer__info-link">
+                            <a href="{{ setting('site_max') }}" class="footer__info-link">
                                 <picture>
                                     <img src="/img/footer/03.webp" srcset="/img/footer/03@2x.webp 2x" alt="">
                                 </picture>

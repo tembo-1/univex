@@ -111,6 +111,7 @@ class CallbacksTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->deferLoading();
     }
 }

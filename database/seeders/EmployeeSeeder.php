@@ -36,6 +36,7 @@ class EmployeeSeeder extends Seeder
                     'user_id' => $user->id,
                     'first_name' => $employee['Name'],
                     'last_name' => $employee['Surname'],
+                    'work_schedule' => 'Пн. -Пт. 9:00 - 18:00',
                     'middle_name' => $employee['Patronymic'],
                     'internal_phone' => $employee['Mobile'],
                     'description' => $employee['Phone']. PHP_EOL .$employee['Mobile'],

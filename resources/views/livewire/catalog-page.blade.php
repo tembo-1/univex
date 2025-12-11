@@ -18,7 +18,7 @@
     </div>
 
     <!-- Основной контент каталога -->
-    <section class="manufacturer animate-block fade-up" data-watch data-watch-once>
+    <section class="manufacturer animate-block" data-watch data-watch-once>
         <div class='manufacturer__container'>
             <h2 class="manufacturer__title block-title">Каталог</h2>
 
@@ -83,7 +83,7 @@
                                                        class="checkbox__input"
                                                        type="checkbox"
                                                        value="{{ $manufacturer->id }}"
-                                                       wire:model.live="selectedManufacturers">
+                                                       wire:model.live="pendingSelectedManufacturers">
                                                 <label for="manufacturer_{{ $manufacturer->id }}"
                                                        class="checkbox__label">
                                                     <span class="checkbox__text">{{ $manufacturer->name }}</span>
@@ -107,7 +107,7 @@
                                             <input id="in_stock"
                                                    class="checkbox__input"
                                                    type="checkbox"
-                                                   wire:model.live="inStock">
+                                                   wire:model.live="pendingInStock">
                                             <label for="in_stock" class="checkbox__label">
                                                 <span class="checkbox__text">Только в наличии</span>
                                             </label>
@@ -116,7 +116,7 @@
                                             <input id="on_sale"
                                                    class="checkbox__input"
                                                    type="checkbox"
-                                                   wire:model.live="onSale">
+                                                   wire:model.live="pendingOnSale">
                                             <label for="on_sale" class="checkbox__label">
                                                 <span class="checkbox__text">Участвует в акции</span>
                                             </label>
@@ -128,9 +128,10 @@
                             <div class="form__bottom">
                                 <button type="button"
                                         class="form__bottom-btn btn btn--blue"
-                                        wire:click="clearFilters">
+                                        wire:click="applyFilters"
+                                        @if(!$filtersChanged) disabled @endif>
                                     ПОКАЗАТЬ
-                                    <span>{{ $this->filteredProductsCount }}</span>
+                                    <span>{{ $this->pendingFilteredProductsCount }}</span>
                                 </button>
                             </div>
                         </form>
@@ -144,9 +145,6 @@
                             class="manufacturer__filter btn btn--blue"
                             wire:click="toggleFilters">
                         фильтры
-                        @if(count($selectedManufacturers) > 0 || $inStock || $onSale)
-                            <span class="filter-badge">{{ count($selectedManufacturers) + ($inStock ? 1 : 0) + ($onSale ? 1 : 0) }}</span>
-                        @endif
                     </button>
 
                     <!-- Таблица товаров -->
@@ -202,7 +200,7 @@
                                             </div>
                                             <div class="table-block__column">
                                                 <div class="table-block__info">
-                                                    <div class="table-block__text">{{ $product->article }}</div>
+                                                    <div class="table-block__text">{{ $product->sku }}</div>
                                                 </div>
                                             </div>
                                             <div class="table-block__column table-block__column--big">
@@ -212,12 +210,12 @@
                                             </div>
                                             <div class="table-block__column">
                                                 <div class="table-block__info">
-                                                    @if($product->replacements && count($product->replacements) > 0)
-                                                        <button type="button"
-                                                                class="table-block__btn"
-                                                                style='--icon:url("/img/icons/39.svg")'
-                                                                wire:click="$dispatch('showReplacements', { productId: {{ $product->id }} })">
-                                                        </button>
+                                                    @if($product->productSubstitutions && count($product->productSubstitutions) > 0)
+                                                        <a href="{{ route('product.show', ['slug' => $product->sku]) }}"
+                                                           class="table-block__btn"
+                                                           style='--icon:url("/img/icons/39.svg")'
+                                                           title="Показать замены">
+                                                        </a>
                                                     @endif
                                                 </div>
                                             </div>
@@ -228,11 +226,7 @@
                                         <div class="table-block__row table-block__row--eleven">
                                             <div class="table-block__column" colspan="5">
                                                 <div class="table-block__info text-center py-4">
-                                                    @if($search || !empty($selectedManufacturers) || $inStock || $onSale)
-                                                        Товары не найдены. Попробуйте изменить параметры поиска.
-                                                    @else
-                                                        Товары пока не добавлены.
-                                                    @endif
+
                                                 </div>
                                             </div>
                                         </div>

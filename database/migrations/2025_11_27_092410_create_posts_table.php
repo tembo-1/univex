@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_visible')->default(false);
             $table->integer('position')->default(0);
             $table->boolean('is_published')->default(false);
-            $table->timestamp('published_at')->nullable();
+            $table->timestamp('starts_at')->nullable();
             $table->timestamps();
         });
     }

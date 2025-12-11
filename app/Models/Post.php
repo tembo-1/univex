@@ -9,9 +9,9 @@ class Post extends Model
 {
     protected $guarded = [];
 
-    public function getPublishedAtAttribute()
+    public function scopeActive($query)
     {
-        return $this->created_at?->translatedFormat('j F Y');
+        return $query->where('is_published', 1);
     }
 
     public function getImageUrlAttribute()

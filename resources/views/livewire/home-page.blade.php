@@ -4,24 +4,31 @@
             <div class="intro__content">
                 <div class="intro__inner">
                     <div class="intro__info fade-up" data-watch data-watch-once>
-                        <h2 class="intro__title">
-                            Ваш склад запчастей
-                            <span>для европейских грузовиков</span>
-                        </h2>
+                        @if($introHeading = $blocks->firstWhere('slug', 'intro')?->siteElements->firstWhere('slug', 'rules-up'))
+                            <h2 class="intro__title">
+                                {!! $introHeading->content !!}
+                            </h2>
+                        @endif
                         <a href="#" class="intro__btn btn btn--icon btn--org" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>заказать звонок</a>
                     </div>
                     <div class="intro__items fade-up" data-watch data-watch-once>
                         <div class="intro__item" style='--icon:url("{{ asset('img/icons/14.svg') }}")'>
-                            <div class="intro__item-text">
-                                Склад в Москве. Быстрая доставка по всей России
-                            </div>
+                            @if($introHeading = $blocks->firstWhere('slug', 'intro')?->siteElements->firstWhere('slug', 'rules-down'))
+                                <div class="intro__item-text">
+                                    {!! $introHeading->content !!}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
                 <div class="intro__img">
                     <picture>
-                        <source media="(max-width: 992px)" srcset="{{ asset('img/intro/01-m.webp') }}, {{ asset('img/intro/01-m@2x.webp') }} 2x">
-                        <img src="{{ asset('img/intro/01.webp') }}" srcset="{{ asset('img/intro/01@2x.webp') }} 2x" alt="">
+                        @if($introHeading = $blocks->firstWhere('slug', 'intro')?->siteElements->firstWhere('slug', 'intro-banner'))
+                            <source media="(max-width: 992px)" srcset="{{ asset('img/intro/01-m.webp') }}, {{ asset('img/intro/01-m@2x.webp') }} 2x">
+                            <img src="{{ $introHeading->imageUrl }}" srcset="{{ $introHeading->imageUrl }} 2x" alt="">
+                        @endif
+{{--                        <source media="(max-width: 992px)" srcset="{{ asset('img/intro/01-m.webp') }}, {{ asset('img/intro/01-m@2x.webp') }} 2x">--}}
+{{--                        <img src="{{ asset('img/intro/01.webp') }}" srcset="{{ asset('img/intro/01@2x.webp') }} 2x" alt="">--}}
                     </picture>
                 </div>
             </div>
@@ -52,21 +59,17 @@
         <div class='partner__container'>
             <div class="partner__slider swiper js-slider-partner">
                 <div class="partner__swiper swiper-wrapper">
-                    <a href="#" class="partner__slide swiper-slide">
-                        <div class="partner__slide-img">
-                            <picture>
-                                <source media="(max-width: 621px)" data-src="{{ asset('img/partner/01-s.webp') }}" data-srcset="{{ asset('img/partner/01-s@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                                <img data-src="{{ asset('img/partner/01.webp') }}" data-srcset="{{ asset('img/partner/01@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                            </picture>
-                        </div>
-                    </a>
-                    <a href="#" class="partner__slide swiper-slide">
-                        <div class="partner__slide-img">
-                            <picture>
-                                <img data-src="{{ asset('img/partner/02.webp') }}" data-srcset="{{ asset('img/partner/02@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                            </picture>
-                        </div>
-                    </a>
+
+                    @foreach($this->blocks->firstWhere('slug', 'slider-banners')->siteElements->first()->siteElementImages as $image )
+                        <a href="{{ $image->href }}" class="partner__slide swiper-slide">
+                            <div class="partner__slide-img">
+                                <picture>
+                                    <source media="(max-width: 621px)" data-src="{{ $image->imageUrl }}" data-srcset="{{ $image->imageUrl }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="{{ $image->alt }}">
+                                    <img data-src="{{ $image->imageUrl }}" data-srcset="{{ $image->imageUrl }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="{{ $image->alt }}">
+                                </picture>
+                            </div>
+                        </a>
+                    @endforeach
                 </div>
                 <div class="partner__arrows swiper-arrows">
                     <button type="button" class="partner__arrow partner__arrow--prev swiper-arrow swiper-arrow--prev" style='--icon:url("{{ asset('img/icons/08.svg') }}")'></button>
@@ -81,7 +84,7 @@
         <div class='admission__container'>
             <div class="admission__top fade-up" data-watch data-watch-once>
                 <h2 class="admission__title block-title">Новые<br>поступления</h2>
-                <a href="#" class="admission__link btn btn--blue btn--icon" style='--icon:url("/img/icons/07.svg")'>Подпишитесь</a>
+                <a href="{{ setting('site_telegram') }}" class="admission__link btn btn--blue btn--icon" style='--icon:url("/img/icons/07.svg")'>Подпишитесь</a>
             </div>
             <div class="admission__row fade-up" data-watch data-watch-once>
                 @foreach($posts as $item)
@@ -95,8 +98,8 @@
                             </picture>
                         </div>
                         <div class="card-product__info">
-                            <time datetime="{{ $item->published_at }}" class="card-product__time">
-                                {{ $item->published_at }}
+                            <time datetime="{{ $item->starts_at ?? $item->created_at }}" class="card-product__time">
+                                {{ $item->starts_at ?? $item->created_at }}
                             </time>
                             <div class="card-product__title">{{ $item->title }}</div>
                         </div>
@@ -116,90 +119,15 @@
                 <div class="spares__value">10 000 +</div>
             </div>
             <div class="spares__row fade-up" data-watch data-watch-once>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/01.webp') }}" data-srcset="{{ asset('img/spares/01@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/02.webp') }}" data-srcset="{{ asset('img/spares/02@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/03.webp') }}" data-srcset="{{ asset('img/spares/03@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/04.webp') }}" data-srcset="{{ asset('img/spares/04@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/05.webp') }}" data-srcset="{{ asset('img/spares/05@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/06.webp') }}" data-srcset="{{ asset('img/spares/06@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/07.webp') }}" data-srcset="{{ asset('img/spares/07@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/08.webp') }}" data-srcset="{{ asset('img/spares/08@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/09.webp') }}" data-srcset="{{ asset('img/spares/09@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/10.webp') }}" data-srcset="{{ asset('img/spares/10@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/11.webp') }}" data-srcset="{{ asset('img/spares/11@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
-                <a href="#" class="spares__column">
-                    <div class="spares__column-img">
-                        <picture>
-                            <img data-src="{{ asset('img/spares/12.webp') }}" data-srcset="{{ asset('img/spares/12@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                        </picture>
-                    </div>
-                </a>
+                @foreach($manufacturers as $manufacturer)
+                    <a href="#" class="spares__column">
+                        <div class="spares__column-img">
+                            <picture>
+                                <img data-src="{{ $manufacturer->imageUrl ?? asset('img/spares/01.webp') }}" data-srcset="{{ asset('img/spares/01@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
+                            </picture>
+                        </div>
+                    </a>
+                @endforeach
             </div>
             <a href="{{ route('manufacturers') }}" class="spares__btn btn btn--showmore fade-up" data-watch data-watch-once>Просмотреть весь каталог</a>
         </div>
@@ -209,14 +137,14 @@
         <div class='location__container'>
             <div class="location__top fade-up" data-watch data-watch-once>
                 <div class="location__top-content">
-                    <h2 class="location__top-title">Москва, район Троицк,<br>Чароитовая улица, 5, стр. 49</h2>
+                    <h2 class="location__top-title">{{ setting('site_address') }}</h2>
                     <div class="location__top-info">
-                        <a href="tel:+74957397210" class="location__top-phone">+7 495 739-72-10</a>
+                        <a href="tel:+74957397210" class="location__top-phone">{{ setting('site_phone') }}</a>
                         <div class="location__top-socials">
                             <a href="#" class="location__top-social" style='--icon:url("{{ asset('img/icons/012.svg') }}")'></a>
                             <a href="#" class="location__top-social" style='--icon:url("{{ asset('img/icons/02.svg') }}")'></a>
                         </div>
-                        <time datetime="2016-11-18T09:54" class="location__top-title">Пн–Пт 8:00 до 17:00</time>
+                        <time datetime="2016-11-18T09:54" class="location__top-title">{{ setting('site_working_hours') }}</time>
                     </div>
                 </div>
                 <a href="#" class="location__top-btn btn btn--alt btn--icon" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Перезвоните нам</a>
@@ -225,20 +153,15 @@
                 <div class="location__info fade-up" data-watch data-watch-once>
                     <div class="location__slider swiper js-slider-location">
                         <div class="location__swiper swiper-wrapper">
-                            <div class="location__slide swiper-slide">
-                                <div class="location__slide-img">
-                                    <picture>
-                                        <img src="{{ asset('img/location/01.webp') }}" srcset="{{ asset('img/location/01@2x.webp') }} 2x" alt="">
-                                    </picture>
+                            @foreach($this->blocks->firstWhere('slug', 'slider-footer-banners')->siteElements->first()->siteElementImages as $image )
+                                <div class="location__slide swiper-slide">
+                                    <div class="location__slide-img">
+                                        <picture>
+                                            <img src="{{ $image->imageUrl }}" srcset="{{ $image->imageUrl }} 2x" alt="">
+                                        </picture>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="location__slide swiper-slide">
-                                <div class="location__slide-img">
-                                    <picture>
-                                        <img src="{{ asset('img/location/01.webp') }}" srcset="{{ asset('img/location/01@2x.webp') }} 2x" alt="">
-                                    </picture>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
                         <div class="location__arrows swiper-arrows">
                             <button type="button" class="location__arrow location__arrow--prev swiper-arrow swiper-arrow--prev" style='--icon:url("{{ asset('img/icons/05.svg') }}")'></button>
@@ -249,11 +172,11 @@
                     <div class="location__row">
                         <div class="location__column">
                             <div class="location__column-title">Парковка</div>
-                            <div class="location__column-text">Парковка: пн–вс, кроме праздников, с 8:00 до 21:00 ч — 450 ₽/ч;<br>с 21:00 до 8:00 ч — 200 ₽/ч</div>
+                            <div class="location__column-text">{{ setting('site_parking') }}</div>
                         </div>
                         <div class="location__column">
                             <div class="location__column-title">Как добраться</div>
-                            <div class="location__column-text">Двигаясь по внутренней стороне Садового кольца свернуть направо на улицу Спиридоновка.</div>
+                            <div class="location__column-text">{{ setting('site_how_to_get') }}</div>
                         </div>
                     </div>
                     <div class="location__bottom">

@@ -135,6 +135,7 @@ class RefundsTable
 //                BulkActionGroup::make([
 //                    DeleteBulkAction::make(),
 //                ]),
-            ]);
+            ])
+            ->deferLoading();
     }
 }

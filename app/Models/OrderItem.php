@@ -23,4 +23,14 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
+
+    public function getUnitPriceRubAttribute()
+    {
+        return $this->unit_price / 100.0;
+    }
+
+    public function getTotalAmountRubAttribute()
+    {
+        return $this->total_amount / 100.0;
+    }
 }

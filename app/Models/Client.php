@@ -19,6 +19,10 @@ class Client extends Model
         return $this->belongsTo(BankAccount::class);
     }
 
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class);
+    }
     public function user()
     {
         return $this->belongsTo(User::class);

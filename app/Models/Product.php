@@ -10,18 +10,23 @@ class Product extends Model
 {
     protected $guarded = [];
 
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
     public function manufacturer(): BelongsTo
     {
         return $this->belongsTo(Manufacturer::class);
     }
 
-    public function productPrice(): HasMany
+    public function productPrices(): HasMany
     {
         return $this->hasMany(ProductPrice::class);
+    }
+
+    public function productSubstitutions()
+    {
+        return $this->hasMany(ProductSubstitution::class);
+    }
+
+    public function productWarehouseStatus()
+    {
+        return $this->belongsTo(ProductWarehouseStatus::class);
     }
 }

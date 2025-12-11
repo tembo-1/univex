@@ -195,6 +195,7 @@ class OrdersTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->deferLoading();
     }
 }

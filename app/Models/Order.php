@@ -35,9 +35,9 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function getTotalAmountAttribute(): int
+    public function getTotalAmountAttribute()
     {
-        return $this->orderItems()->sum('total_amount');
+        return $this->orderItems()->sum('total_amount') / 100.0;
     }
 
     public function getQuantityAttribute(): int

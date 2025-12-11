@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('middle_name')->nullable();
             $table->string('internal_phone')->nullable();
+            $table->string('work_schedule')->nullable();
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('code')->nullable();

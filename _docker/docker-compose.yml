@@ -58,7 +58,7 @@ services:
             - mysql-data:/var/lib/mysql
         environment:
             MYSQL_DATABASE: univex
-            MYSQL_ROOT_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: Uq3j588-LI
         ports:
             - "3306:3306"
         command: [
