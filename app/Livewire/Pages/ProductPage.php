@@ -21,8 +21,8 @@ class ProductPage extends Component
     public array $selectedWarehouseTypes = [];
     public bool $inStockOnly = false;
     public bool $onSaleOnly = false;
-    public ?float $minPrice = null;
-    public ?float $maxPrice = null;
+    public ?float $minPrice = 0;
+    public ?float $maxPrice = 0;
     public string $sortBy = '';
 
     // Цены
