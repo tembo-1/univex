@@ -53,7 +53,7 @@ services:
             - app-network
 
     minio:
-        image: minio/minio:latest
+        image: minio/minio:RELEASE.2025-04-22T22-12-26Z
         container_name: minio
         restart: always
         ports:
@@ -63,8 +63,6 @@ services:
         environment:
             MINIO_ROOT_USER: minio
             MINIO_ROOT_PASSWORD: rootroot
-            MINIO_SERVER_URL: "http://0.0.0.0:3377"
-            MINIO_BROWSER_REDIRECT_URL: "http://0.0.0.0:3388"
         volumes:
             - minio-univex:/data
         networks:
