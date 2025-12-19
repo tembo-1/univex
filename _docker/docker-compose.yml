@@ -63,7 +63,8 @@ services:
         environment:
             MINIO_ROOT_USER: minio
             MINIO_ROOT_PASSWORD: rootroot
-            MINIO_SERVER_URL: "http://82.202.128.40:3377"
+            MINIO_SERVER_URL: "http://0.0.0.0:3377"
+            MINIO_BROWSER_REDIRECT_URL: "http://0.0.0.0:3388"
         volumes:
             - minio-univex:/data
         networks:
