@@ -25,10 +25,6 @@ class ProductPage extends Component
     public ?float $maxPrice = 0;
     public string $sortBy = '';
 
-    // Цены
-    public float $priceMin = 0;
-    public float $priceMax = 0;
-
     // Производители
     public Collection $manufacturers;
 
@@ -45,7 +41,7 @@ class ProductPage extends Component
             ->firstWhere('user_id', auth()->id());
 
         $this->loadProducts();
-        $this->calculatePriceRange();
+//        $this->calculatePriceRange();
         $this->loadManufacturers();
     }
 
@@ -110,17 +106,17 @@ class ProductPage extends Component
             ->values();
     }
 
-    public function calculatePriceRange()
-    {
-        if ($this->products->isNotEmpty()) {
-            $this->priceMin = $this->products->min('price');
-            $this->priceMax = $this->products->max('price');
-
-            // Устанавливаем начальные значения
-            $this->minPrice = $this->priceMin;
-            $this->maxPrice = $this->priceMax;
-        }
-    }
+//    public function calculatePriceRange()
+//    {
+//        if ($this->products->isNotEmpty()) {
+//            $this->priceMin = $this->products->min('price');
+//            $this->priceMax = $this->products->max('price');
+//
+//            // Устанавливаем начальные значения
+//            $this->minPrice = $this->priceMin;
+//            $this->maxPrice = $this->priceMax;
+//        }
+//    }
 
     public function applyFilters()
     {

@@ -143,10 +143,10 @@
 
                                     <div class="range__values js-range-values">
                                         <div class="range__value" data-value="от">
-                                            <input wire:model.live="minPrice" id="rng2" class="input range__range-value" autocomplete="off" type="text" name="minPrice" aria-label="Минимальное значение" placeholder="" data-range-min="{{ $priceMin }}">
+                                            <input wire:model.live="minPrice" id="rng2" class="input range__range-value" autocomplete="off" type="text" name="minPrice" aria-label="Минимальное значение" placeholder="" data-range-min="0">
                                         </div>
                                         <div class="range__value" data-value="до">
-                                            <input wire:model.live="maxPrice" class="input range__range-value" autocomplete="off" aria-label="Максимальное значение" type="text" name="maxPrice" placeholder="" data-range-max="{{ $priceMax }}">
+                                            <input wire:model.live="maxPrice" class="input range__range-value" autocomplete="off" aria-label="Максимальное значение" type="text" name="maxPrice" placeholder="" data-range-max="0">
                                         </div>
                                     </div>
                                 </div>
