@@ -52,6 +52,11 @@ class AnnouncementRecipientGroupSeeder extends Seeder
                 'name' => 'Гости',
                 'slug' => 'guests',
                 'description' => 'Только для неавторизованных посетителей',
+            ],
+            [
+                'name' => 'Персональное уведомление',
+                'slug' => 'personal',
+                'description' => 'Персональное уведомление',
             ]
         ]);
     }

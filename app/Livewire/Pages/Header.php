@@ -18,8 +18,9 @@ class Header extends Component
         $this->getUserName();
 
         $this->menus = Menu::query()
-                ->where('is_active', true)
-                ->get();
+            ->with(['menuItems', 'menuItems.sitePage'])
+            ->where('is_active', true)
+            ->get();
     }
     public function render()
     {

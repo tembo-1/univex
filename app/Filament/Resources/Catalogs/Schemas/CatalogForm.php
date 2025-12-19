@@ -35,16 +35,6 @@ class CatalogForm
                             ->helperText('Это название увидят пользователи')
                             ->columnSpanFull(),
 
-                        TextInput::make('slug')
-                            ->label('URL адрес')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true)
-                            ->placeholder('url-kataloga')
-                            ->helperText('Используется в адресной строке')
-                            ->prefix(fn() => url('/catalogs/'))
-                            ->columnSpanFull(),
-
                         Textarea::make('description')
                             ->label('Описание')
                             ->rows(3)
@@ -63,6 +53,7 @@ class CatalogForm
                 Section::make('Приложенные файлы')
                     ->schema([
                         Repeater::make('files')
+                            ->label('Прикрепленные файлы')
                             ->relationship('catalogFiles')
                             ->schema([
                                 TextInput::make('name')

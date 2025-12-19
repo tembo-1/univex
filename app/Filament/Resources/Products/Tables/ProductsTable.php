@@ -16,32 +16,33 @@ class ProductsTable
         return $table
             ->columns([
                 TextColumn::make('id')->label('ID'),
-                TextColumn::make('name')->label('name'),
-                TextColumn::make('sku')->label('sku'),
+                TextColumn::make('name')->label('Название')->searchable()->sortable(),
+                TextColumn::make('sku')->label('Артикул')->searchable()->sortable(),
+                TextColumn::make('oem')->label('OEM')->searchable()->toggleable(),
+                TextColumn::make('manufacturer.name')->label('Производитель')->searchable()->sortable(),
+                TextColumn::make('productWarehouseStatus.name')->label('Статус')->badge(),
+                TextColumn::make('on_sale')->label('Акция')
+                    ->formatStateUsing(fn ($state) => $state ? 'Да' : 'Нет')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'gray'),
+                TextColumn::make('sale_discount')->label('Скидка')
+                    ->formatStateUsing(fn ($state) => $state ? $state : '-')
+                    ->alignCenter(),
+                TextColumn::make('min_order_quantity')->label('Мин. заказ')->alignCenter(),
+                TextColumn::make('created_at')->label('Создан')
+                    ->dateTime('d.m.Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')->label('Обновлен')
+                    ->dateTime('d.m.Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->recordActions([
                 EditAction::make(),
-            ])
-            ->groups([
-                Group::make('category.name')
-                    ->label('По категориям')
-                    ->collapsible(),
-
-                Group::make('manufacturer.name')
-                    ->label('По производителям')
-                    ->collapsible(),
-
-                Group::make('is_active')
-                    ->label('По статусу')
-                    ->collapsible(),
-
-                Group::make('created_at')
-                    ->label('По дате создания')
-                    ->date()
-                    ->collapsible(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

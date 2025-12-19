@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('warehouse_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_price_id')->constrained();
+            $table->foreignId('product_id')->constrained();
             $table->foreignId('warehouse_id')->constrained();
             $table->integer('quantity')->default(0);
             $table->timestamps();
 
-            $table->unique(['warehouse_id', 'product_price_id']);
-            $table->index('product_price_id');
+            $table->unique(['warehouse_id', 'product_id']);
+            $table->index('product_id');
             $table->index('warehouse_id');
         });
     }

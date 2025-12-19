@@ -96,12 +96,6 @@ class RefundForm
                                             ->placeholder('Не указан')
                                             ->helperText('Адрес для доставки заказа'),
 
-                                        Toggle::make('order_is_paid')
-                                            ->label('Статус оплаты')
-                                            ->disabled()
-//                                            ->placeholder('Не оплачен')
-                                            ->helperText('Текущий статус оплаты'),
-
                                         // Временные метки
                                         TextInput::make('order_created_at')
                                             ->label('Дата создания заказа')

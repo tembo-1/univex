@@ -19,7 +19,7 @@ class ManufacturerSeeder extends Seeder
         $json = Storage::disk('public')->get('univexnav_manufacturer.json');
         $manufactures = json_decode($json, true);
 
-        $data = collect($manufactures[2]['data'])->map(function ($manufacture) {
+        $data = collect($manufactures[2]['data'])->unique('ID')->map(function ($manufacture) {
             return [
                 'name' => $manufacture['ManufacturerName'],
                 'slug' => Str::slug($manufacture['ManufacturerName']),

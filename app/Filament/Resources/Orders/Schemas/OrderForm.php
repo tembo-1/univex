@@ -75,14 +75,14 @@ class OrderForm
                                     ->schema([
                                         Grid::make(2)
                                             ->schema([
-                                                Toggle::make('is_paid')
-                                                    ->label('Оплачен')
-                                                    ->onColor('success')
-                                                    ->offColor('danger')
-                                                    ->disabled()
-                                                    ->onIcon('heroicon-o-check-circle')
-                                                    ->offIcon('heroicon-o-x-circle')
-                                                    ->inline(false),
+//                                                Toggle::make('is_paid')
+//                                                    ->label('Оплачен')
+//                                                    ->onColor('success')
+//                                                    ->offColor('danger')
+//                                                    ->disabled()
+//                                                    ->onIcon('heroicon-o-check-circle')
+//                                                    ->offIcon('heroicon-o-x-circle')
+//                                                    ->inline(false),
 
                                                 Select::make('order_status_id')
                                                     ->options(function () {

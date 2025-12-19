@@ -9,7 +9,7 @@
                                 {!! $introHeading->content !!}
                             </h2>
                         @endif
-                        <a href="#" class="intro__btn btn btn--icon btn--org" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>заказать звонок</a>
+                        <a href="{{ route('popup.callback') }}" data-popup="#callback-popupTwo" class="intro__btn btn btn--icon btn--org" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>заказать звонок</a>
                     </div>
                     <div class="intro__items fade-up" data-watch data-watch-once>
                         <div class="intro__item" style='--icon:url("{{ asset('img/icons/14.svg') }}")'>
@@ -42,7 +42,7 @@
                     <h2 class="quest-block__title block-title">Быстрый поиск<br>по артикулу</h2>
                 </div>
                 <div class="quest-block__content fade-up" data-watch data-watch-once>
-                    <form action="#" class="quest-block__form form">
+                    <form action="{{ route('catalog') }}" class="quest-block__form form">
                         <div class="form__search">
                             <div class="form__search-input">
                                 <input autocomplete="off" type="text" name="search" data-error="Ошибка" placeholder="Артикул или наименование…" class="input">
@@ -112,26 +112,7 @@
         </div>
     </section>
 
-    <section class="spares animate-block">
-        <div class='spares__container'>
-            <div class="spares__top fade-up" data-watch data-watch-once>
-                <h2 class="spares__title block-title">Каталог<br>запчастей</h2>
-                <div class="spares__value">10 000 +</div>
-            </div>
-            <div class="spares__row fade-up" data-watch data-watch-once>
-                @foreach($manufacturers as $manufacturer)
-                    <a href="#" class="spares__column">
-                        <div class="spares__column-img">
-                            <picture>
-                                <img data-src="{{ $manufacturer->imageUrl ?? asset('img/spares/01.webp') }}" data-srcset="{{ asset('img/spares/01@2x.webp') }} 2x" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Рекомендованный товар">
-                            </picture>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-            <a href="{{ route('manufacturers') }}" class="spares__btn btn btn--showmore fade-up" data-watch data-watch-once>Просмотреть весь каталог</a>
-        </div>
-    </section>
+    @livewire('components.blocks.manufacturers')
 
     <section class="location animate-block">
         <div class='location__container'>
@@ -147,7 +128,7 @@
                         <time datetime="2016-11-18T09:54" class="location__top-title">{{ setting('site_working_hours') }}</time>
                     </div>
                 </div>
-                <a href="#" class="location__top-btn btn btn--alt btn--icon" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Перезвоните нам</a>
+                <a href="{{ route('popup.callback') }}" data-popup="#callback-popupTwo" class="location__top-btn btn btn--alt btn--icon" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Перезвоните нам</a>
             </div>
             <div class="location__inner">
                 <div class="location__info fade-up" data-watch data-watch-once>

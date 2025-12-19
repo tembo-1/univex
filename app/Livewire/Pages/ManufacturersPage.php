@@ -22,19 +22,15 @@ class ManufacturersPage extends Component
 
     public function loadManufacturers()
     {
-        // Используем Query Builder для работы с базой данных
         $query = Manufacturer::query()
             ->where('is_active', true);
 
-        // Применяем поиск если есть
         if ($this->search) {
             $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        // Получаем общее количество для пагинации
         $totalManufacturers = $query->count();
 
-        // Получаем производителей для текущей страницы
         $this->loadedManufacturers = $query
             ->limit($this->page * $this->perPage)
             ->get();
@@ -51,7 +47,6 @@ class ManufacturersPage extends Component
 
     public function updatedSearch()
     {
-        // При поиске сбрасываем на первую страницу
         $this->page = 1;
         $this->loadManufacturers();
     }

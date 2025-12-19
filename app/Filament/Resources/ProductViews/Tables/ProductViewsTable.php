@@ -31,7 +31,7 @@ class ProductViewsTable
                     ->copyable()
                     ->copyMessage('Артикул скопирован'),
 
-                TextColumn::make('product.manufacture.name')
+                TextColumn::make('product.manufacturer.name')
                     ->label('Производитель')
                     ->searchable()
                     ->sortable()

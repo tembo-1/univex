@@ -24,11 +24,6 @@ class HomePage extends Component
             ->active()
             ->get();
 
-        $this->manufacturers = Manufacturer::query()
-            ->where('is_visible', 1)
-            ->limit(12)
-            ->get();
-
         $this->page = SitePage::query()
             ->firstWhere('slug', 'home');
 

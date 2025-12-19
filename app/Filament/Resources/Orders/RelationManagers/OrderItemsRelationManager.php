@@ -85,16 +85,16 @@ class OrderItemsRelationManager extends RelationManager
                     ->after(function () {
                         redirect(request()->header('Referer'));
                     }),
-                EditAction::make()
-                    ->disabled(function ($record) {
-                        if ($record->order->orderStatus->slug == 'processed') {
-                            return true;
-                        }
-                        return false;
-                    })
-                    ->after(function () {
-                        redirect(request()->header('Referer'));
-                    }),
+//                EditAction::make()
+//                    ->disabled(function ($record) {
+//                        if ($record->order->orderStatus->slug == 'processed') {
+//                            return true;
+//                        }
+//                        return false;
+//                    })
+//                    ->after(function () {
+//                        redirect(request()->header('Referer'));
+//                    }),
             ]);
     }
 
@@ -138,9 +138,9 @@ class OrderItemsRelationManager extends RelationManager
                                     $set('product_name', $product->name);
                                     $set('product_sku', $product->sku);
                                     $set('product_oem', $product->oem);
-                                    $set('unit_price', $product->productPrice()?->min('price') ?? 0);
+                                    $set('unit_price', $product->productPrices()?->min('price') ?? 0);
                                     $set('quantity', $product->min_order_quantity ?: 1);
-                                    $set('total_amount', ($product->productPrice()?->min('price') ?? 0) * ($product->min_order_quantity ?: 1));
+                                    $set('total_amount', ($product->productPrices()?->min('price') ?? 0) * ($product->min_order_quantity ?: 1));
                                 }
                             }),
 

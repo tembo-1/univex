@@ -56,7 +56,9 @@
                             <a href="tel:{{ setting('site_phone') }}" class="menu__constructor-item" style='--icon:url("{{ asset('img/icons/31.svg') }}")'>
                                 <b>{{ setting('site_phone') }}</b>
                             </a>
-                            <a href="#" class="menu__constructor-link btn btn--blue btn--icon" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Заказать звонок</a>
+                            <a href="{{ route('popup.callback') }}" data-popup="#callback-popupTwo"
+                               class="menu__constructor-link btn btn--blue btn--icon"
+                               style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Заказать звонок</a>
                         </div>
                         <div class="menu__constructor-btns">
                             <a href="#" class="menu__constructor-btn js-open-search" style='--icon:url("{{ asset('img/icons/32.svg') }}")'></a>
@@ -81,7 +83,7 @@
                             @endif
                         </div>
                     </div>
-                    <form action="#" class="menu__form form">
+                    <form action="{{ route('catalog') }}" class="menu__form form">
                         <div class="form__search">
                             <div class="form__search-input">
                                 <input autocomplete="off" type="text" name="search" data-error="Ошибка" placeholder="Артикул или наименование…" class="input">

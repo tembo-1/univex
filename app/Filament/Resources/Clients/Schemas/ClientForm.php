@@ -221,16 +221,8 @@ class ClientForm
                                     ->maxLength(255)
                                     ->placeholder('example@company.ru')
                                     ->helperText('Будет использоваться для входа в систему')
+                                    ->columnSpanFull()
                                     ->suffixIcon('heroicon-m-envelope'),
-
-                                TextInput::make('user.password')
-                                    ->label('Пароль')
-                                    ->required()
-                                    ->password()
-                                    ->revealable()
-                                    ->minLength(5)
-                                    ->helperText('Мин. число символов 5')
-                                    ->maxLength(255),
                             ]),
                         Fieldset::make('Контактные данные')
                             ->schema([

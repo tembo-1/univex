@@ -29,15 +29,15 @@ class CatalogsTable
                     ->icon('heroicon-o-folder')
                     ->iconColor('primary'),
 
-                TextColumn::make('slug')
-                    ->badge()
-                    ->label('URL')
-                    ->copyable()
-                    ->copyMessage('URL скопирован')
-                    ->color('gray')
-                    ->icon('heroicon-o-link')
-                    ->limit(20)
-                    ->tooltip('Нажмите чтобы скопировать URL'),
+//                TextColumn::make('slug')
+//                    ->badge()
+//                    ->label('URL')
+//                    ->copyable()
+//                    ->copyMessage('URL скопирован')
+//                    ->color('gray')
+//                    ->icon('heroicon-o-link')
+//                    ->limit(20)
+//                    ->tooltip('Нажмите чтобы скопировать URL'),
 
                 ToggleColumn::make('is_active')
                     ->label('Статус')

@@ -47,6 +47,7 @@ class OrganizationSeeder extends Seeder
                         ->create([
                             'email'     => $organization['Login'],
                             'password'  => $organization['Password'],
+                            'code'  => $organization['No'],
                         ]);
 
                     $organizationModel = Client::query()
@@ -62,6 +63,7 @@ class OrganizationSeeder extends Seeder
                             'personal_discount'         => floatval($organization['Disc']),
                             'legal_address'             => $organization['Address'],
                             'postal_address'            => $organization['AddressFact'],
+                            'phone'                     => $organization['Phone'],
                         ]);
 
                     BankAccount::query()

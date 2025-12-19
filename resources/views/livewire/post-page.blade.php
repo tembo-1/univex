@@ -61,7 +61,7 @@
                 </div>
                 <div class="newspaper__content fade-up" data-watch data-watch-once>
                     <div class="newspaper__description">
-                        <div class="content-reset">
+                        <div class="content-reset newspaper__description-text">
                             {!! $post->content !!}
                         </div>
                     </div>

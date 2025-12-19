@@ -4,6 +4,7 @@ namespace App\Livewire\Pages;
 
 use App\Models\Manufacturer;
 use App\Models\Product;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,44 +14,51 @@ class CatalogPage extends Component
     use WithPagination;
 
     #[Url]
-    public $search = '';
+    public array $selectedManufacturers = [];
 
     #[Url]
-    public $selectedManufacturers = [];
+    public bool $inStockOnly = false;
 
     #[Url]
-    public $inStock = false;
+    public bool $onSaleOnly = false;
 
     #[Url]
-    public $onSale = false;
+    public string $search = '';
 
-    public $showFilters = false;
-    public $manufacturerSearch = '';
-    public $perPage = 20;
+    public string $searchManufacturers = '';
+    public int $page = 1;
+    public  $productsCount;
+    public array $searchHistory = [];
 
-    public $pendingSelectedManufacturers = [];
-    public $pendingInStock = false;
-    public $pendingOnSale = false;
-    public $pendingSearch = '';
-    public $filtersChanged = false;
+    public Collection $products;
+    public Collection $manufacturers;
 
-    public function mount()
+    public function mount(): void
     {
-        $this->pendingSelectedManufacturers = $this->selectedManufacturers;
-        $this->pendingInStock = $this->inStock;
-        $this->pendingOnSale = $this->onSale;
-        $this->pendingSearch = $this->search; // ДОБАВЛЕНО
+        $this->loadManufacturers();
+        $this->loadSearchHistory();
+
+        if ($this->selectedManufacturers or $this->onSaleOnly or $this->inStockOnly or $this->search) {
+            $this->applyFilters();
+        } else {
+            $this->loadProducts();
+        }
     }
 
-    public function getProductsProperty()
+    public function loadSearchHistory(): void
+    {
+        $this->searchHistory = session()->get('search_history', []);
+    }
+
+    public function applyFilters(): void
     {
         $query = Product::query()
             ->with('manufacturer')
             ->select(['id', 'name', 'manufacturer_id', 'sku', 'oem'])
             ->orderBy('id');
 
-        // Применяем ПОИСК из активных фильтров
         if ($this->search) {
+            $this->addToSearchHistory($this->search);
             $query->where(function($q) {
                 $q->where('name', 'like', $this->search . '%')
                     ->orWhere('sku', 'like', $this->search . '%')
@@ -65,131 +73,146 @@ class CatalogPage extends Component
             $query->whereIn('manufacturer_id', $this->selectedManufacturers);
         }
 
-        if ($this->inStock) {
-            $query->where('product_warehouse_status_id', 1);
-        }
-
-        if ($this->onSale) {
+        if ($this->onSaleOnly) {
             $query->where('on_sale', true);
         }
 
-        return $query->paginate($this->perPage);
-    }
-
-    public function getManufacturersProperty()
-    {
-        $query = Manufacturer::query()
-            ->select(['id', 'name'])
-            ->orderBy('id');
-
-        if ($this->manufacturerSearch) {
-            $query->where('name', 'like', $this->manufacturerSearch . '%');
-        }
-
-        if (empty($this->manufacturerSearch) && !empty($this->pendingSelectedManufacturers)) {
-            $selectedManufacturers = Manufacturer::whereIn('id', $this->pendingSelectedManufacturers)
-                ->select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-
-            $otherManufacturers = $query->whereNotIn('id', $this->pendingSelectedManufacturers)
-                ->limit(10 - $selectedManufacturers->count())
-                ->get();
-
-            return $selectedManufacturers->merge($otherManufacturers);
-        }
-
-        return $query->limit(10)->get();
-    }
-
-    public function getPendingFilteredProductsCountProperty()
-    {
-        $query = Product::query()
-            ->with('manufacturer')
-            ->select(['id', 'name', 'manufacturer_id', 'sku', 'oem'])
-            ->orderBy('id');
-
-        if ($this->pendingSearch) {
-            $query->where(function($q) {
-                $q->where('name', 'like', $this->pendingSearch . '%')
-                    ->orWhere('sku', 'like', $this->pendingSearch . '%')
-                    ->orWhere('id', 'like', $this->pendingSearch . '%')
-                    ->orWhereHas('manufacturer', function($mq) {
-                        $mq->where('name', 'like', $this->pendingSearch . '%');
-                    });
+        if ($this->inStockOnly) {
+            $query->whereHas('warehouseProducts', function ($query) {
+                return $query->where('quantity', '>', 0);
             });
         }
 
-        if (!empty($this->pendingSelectedManufacturers)) {
-            $query->whereIn('manufacturer_id', $this->pendingSelectedManufacturers);
+        $this->products = $query->limit($this->page * 30)->get();
+    }
+
+    public function addToSearchHistory(string $query): void
+    {
+        // Чистим запрос
+        $query = trim($query);
+
+        // Пропускаем слишком короткие запросы
+        if (strlen($query) < 2) {
+            return;
         }
 
-        if ($this->pendingInStock) {
-            $query->where('product_warehouse_status_id', 1);
+        // Пропускаем пустые
+        if (empty($query)) {
+            return;
         }
 
-        if ($this->pendingOnSale) {
-            $query->where('on_sale', true);
+        // Получаем текущую историю
+        $history = session()->get('search_history', []);
+
+        // Удаляем этот запрос если он уже есть (чтобы переместить в начало)
+        $history = array_filter($history, fn($item) => $item !== $query);
+
+        // Добавляем в начало
+        array_unshift($history, $query);
+
+        // Ограничиваем до 10 записей
+        $history = array_slice($history, 0, 10);
+
+        // Сохраняем в сессию
+        session()->put('search_history', $history);
+
+        // Обновляем свойство компонента
+        $this->searchHistory = $history;
+    }
+
+    public function searchFromHistory(string $query): void
+    {
+        $this->search = $query;
+        $this->applyFilters();
+    }
+
+    public function removeFromHistory(string $query): void
+    {
+        $history = session()->get('search_history', []);
+
+        // Удаляем запрос
+        $history = array_filter($history, fn($item) => $item !== $query);
+
+        // Переиндексируем массив
+        $history = array_values($history);
+
+        // Сохраняем в сессию
+        session()->put('search_history', $history);
+
+        // Обновляем свойство компонента
+        $this->searchHistory = $history;
+    }
+
+    public function clearSearchHistory(): void
+    {
+        // Очищаем сессию
+        session()->forget('search_history');
+
+        // Очищаем свойство компонента
+        $this->searchHistory = [];
+    }
+
+
+//    public function loadMore(): void
+//    {
+//        $this->page++;
+//        dd($this->products);
+//    }
+//
+//    public function getHasMoreProperty()
+//    {
+//        $total = $this->products->count();
+//        $shown = count($this->notifications);
+//
+//        return $total > $shown;
+//    }
+
+    public function updatedSearchManufacturers(): void
+    {
+        if ($this->searchManufacturers) {
+            $this->manufacturers = Manufacturer::query()
+                ->where('name', 'like', $this->searchManufacturers . '%')
+                ->limit(30)
+                ->get();
+        } else {
+            $selectedManufacturers = Manufacturer::query()
+                ->whereIn('id', $this->selectedManufacturers)
+                ->get();
+
+            $otherManufacturers = Manufacturer::query()
+                ->where('is_active', true)
+                ->whereNotIn('id', $this->selectedManufacturers)
+                ->limit(30 - $selectedManufacturers->count())
+                ->get();
+
+            $this->manufacturers = $selectedManufacturers->merge($otherManufacturers);
         }
-
-        return $query->count();
     }
 
-    public function applyFilters()
+    public function resetFilters(): void
     {
-        // Применяем ВСЕ временные фильтры, включая поиск
-        $this->search = $this->pendingSearch;
-        $this->selectedManufacturers = $this->pendingSelectedManufacturers;
-        $this->inStock = $this->pendingInStock;
-        $this->onSale = $this->pendingOnSale;
+        $this->selectedManufacturers = [];
+        $this->inStockOnly = false;
+        $this->onSaleOnly = false;
 
-        $this->filtersChanged = false;
-        $this->resetPage();
-        $this->showFilters = false;
+        $this->loadProducts();
     }
 
-    public function clearFilters()
+    public function loadProducts(): void
     {
-        $this->reset([
-            'search',
-            'selectedManufacturers',
-            'inStock',
-            'onSale',
-            'pendingSearch',
-            'pendingSelectedManufacturers',
-            'pendingInStock',
-            'pendingOnSale',
-            'manufacturerSearch'
-        ]);
-        $this->filtersChanged = false;
-        $this->resetPage();
+        $this->products = Product::query()
+            ->with('manufacturer')
+            ->whereNot('product_warehouse_status_id', 3)
+            ->limit($this->page * 30)
+            ->get();
     }
 
-    // Отслеживаем изменения временных фильтров
-    public function updatedPendingSelectedManufacturers()
+    public function loadManufacturers(): void
     {
-        $this->filtersChanged = true;
-    }
-
-    public function updatedPendingInStock()
-    {
-        $this->filtersChanged = true;
-    }
-
-    public function updatedPendingOnSale()
-    {
-        $this->filtersChanged = true;
-    }
-
-    // ДОБАВЛЕНО: отслеживаем изменение временного поиска
-    public function updatedPendingSearch()
-    {
-        $this->filtersChanged = true;
-    }
-
-    public function toggleFilters()
-    {
-        $this->showFilters = !$this->showFilters;
+        $this->manufacturers = Manufacturer::query()
+            ->where('is_active', true)
+            ->limit(10)
+            ->get();
     }
 
     public function render()

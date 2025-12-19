@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Notification extends Model
@@ -18,6 +19,12 @@ class Notification extends Model
     public function notificationType(): BelongsTo
     {
         return $this->belongsTo(NotificationType::class);
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'notification_recipients')
+            ->withTimestamps();
     }
 
     public function notificationRecipients(): HasMany

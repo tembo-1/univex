@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->nullable();
             $table->string('email')->nullable();
+            $table->string('address')->nullable();
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(1);
             $table->string('code')->default(1);

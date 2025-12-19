@@ -23,23 +23,7 @@
             <div class="cabinet__inner">
                 <aside class="cabinet__aside">
                     <div class="cabinet__info">
-                        <div class="cabinet__info-items">
-                            <a href="javascript:void(0)" class="cabinet__info-item" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>
-                                <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/60.svg&quot;)'>Заказы</div>
-                            </a>
-                            <a href="javascript:void(0)" class="cabinet__info-item" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>
-                                <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/62.svg&quot;)'>Взаиморасчеты</div>
-                            </a>
-                            <a href="javascript:void(0)" class="cabinet__info-item" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>
-                                <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/63.svg&quot;)'>Возвраты</div>
-                            </a>
-                            <a href="javascript:void(0)" class="cabinet__info-item" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>
-                                <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/64.svg&quot;)'>Блокнот</div>
-                            </a>
-                            <a href="javascript:void(0)" class="cabinet__info-item _active" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>
-                                <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/65.svg&quot;)'>Профиль</div>
-                            </a>
-                        </div>
+                        @livewire('components.blocks.user-menu')
                         <div class="cabinet__manager manager-cabinet">
                             <div class="manager-cabinet__title">Ваш МЕНЕДЖЕР</div>
                             <div class="manager-cabinet__name">{{ $manager->fullName }}</div>

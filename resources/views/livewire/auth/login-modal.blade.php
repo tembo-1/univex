@@ -9,7 +9,6 @@
                     <div class="popup__title">Вход</div>
                 </div>
 
-                {{-- Livewire компонент внутри игнорируемого контейнера --}}
                 <div id="livewire-container">
                     @livewire('auth.login-form')
                 </div>

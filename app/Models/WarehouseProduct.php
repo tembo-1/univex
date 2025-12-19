@@ -13,8 +13,8 @@ class WarehouseProduct extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function productPrice()
+    public function product()
     {
-        return $this->belongsTo(ProductPrice::class);
+        return $this->belongsTo(Product::class);
     }
 }

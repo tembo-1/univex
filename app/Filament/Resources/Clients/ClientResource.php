@@ -23,6 +23,8 @@ class ClientResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|null|UnitEnum $navigationGroup = 'Управления менеджерами и организациями';
     protected static ?string $navigationLabel = 'Организации';
+    protected static ?string $modelLabel = 'Организации';
+    protected static ?string $pluralModelLabel = 'Организации';
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
@@ -57,9 +59,9 @@ class ClientResource extends Resource
     {
         return [
             'index' => ListClients::route('/'),
-            'create' => CreateClient::route('/create'),
+//            'create' => CreateClient::route('/create'),
             'view' => ViewClient::route('/{record}'),
-            'edit' => EditClient::route('/{record}/edit'),
+//            'edit' => EditClient::route('/{record}/edit'),
         ];
     }
 }

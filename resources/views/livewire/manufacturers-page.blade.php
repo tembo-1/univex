@@ -47,7 +47,7 @@
                 <div class="manufacturer__row @if($page == 1) @endif"
                      @if($page == 1) data-watch data-watch-once @endif>
                     @foreach($manufacturers as $manufacturer)
-                        <a href="#" class="manufacturer__column"
+                        <a href="{{ route('catalog') . '?selectedManufacturers[0]=' . $manufacturer->id }}" class="manufacturer__column"
                            style='--icon:url("/img/icons/16.svg")'>
                             <div class="manufacturer__column-text">{{ $manufacturer->name }}</div>
                         </a>

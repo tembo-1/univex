@@ -32,24 +32,6 @@ services:
         networks:
             - app-network
 
-#    vault:
-#        image: vault:1.13.3
-#        container_name: vault
-#        restart: unless-stopped
-#        ports:
-#            - "8200:8200"
-#        environment:
-#            VAULT_DEV_ROOT_TOKEN_ID: root
-#            VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
-#            VAULT_ADDR: http://0.0.0.0:8200
-#        cap_add:
-#            - IPC_LOCK
-#        volumes:
-#            - vault-data:/vault/data
-#        networks:
-#            - app-network
-#        command: server -dev
-
     mysql:
         image: mysql:8.0
         restart: always
@@ -58,7 +40,7 @@ services:
             - mysql-data:/var/lib/mysql
         environment:
             MYSQL_DATABASE: univex
-            MYSQL_ROOT_PASSWORD: Uq3j588-LI
+            MYSQL_ROOT_PASSWORD: -kzQKmu9b9
         ports:
             - "3306:3306"
         command: [
@@ -123,9 +105,24 @@ services:
         networks:
             - app-network
 
+    meilisearch:
+        image: getmeili/meilisearch
+        container_name: meilisearch
+        restart: unless-stopped
+        ports:
+            - "7700:7700"
+        environment:
+            - MEILI_ENV=development
+            - MEILI_NO_ANALYTICS=true
+        volumes:
+            - meilisearch_data:/meili_data
+        networks:
+            - app-network
+
 volumes:
     mysql-data:
     minio-univex:
+    meilisearch_data:
 #    vault-data:
 
 networks:

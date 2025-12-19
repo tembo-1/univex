@@ -24,7 +24,7 @@ class ProductOriginalSeeder extends Seeder
         $originals = json_decode($json, true);
 
         // Обрабатываем данные пачками
-        collect($originals[2]['data'])->chunk(1000)->each(function ($chunk) {
+        collect($originals[2]['data'])->chunk(5000)->each(function ($chunk) {
 
             // Предварительная загрузка для текущей пачки
             $manufactureNames = $chunk->pluck('Mark')->unique()->filter();

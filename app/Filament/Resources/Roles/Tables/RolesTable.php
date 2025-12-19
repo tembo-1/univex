@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Filament\Resources\Roles\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+class RolesTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('name')
+                    ->label('Роль')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('permissions_count')
+                    ->label('Разрешений')
+                    ->counts('permissions')
+                    ->sortable(),
+
+                TextColumn::make('users_count')
+                    ->label('Пользователей')
+                    ->counts('users')
+                    ->sortable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}

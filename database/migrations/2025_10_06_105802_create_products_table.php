@@ -25,11 +25,20 @@ return new class extends Migration
             $table->foreignId('product_warehouse_status_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
 
             $table->string('code');
-            $table->string('price_code');
 
             $table->index('code');
-            $table->index('price_code');
 
+            $table->index('manufacturer_id');
+            $table->index('on_sale');
+            $table->index('product_warehouse_status_id');
+
+            $table->index(['manufacturer_id', 'on_sale']); // фильтр производителя + акция
+            $table->index(['manufacturer_id', 'product_warehouse_status_id']); // фильтр производителя + статус
+
+            $table->index(['sku']);
+
+            // Полнотекстовый
+            $table->fullText(['name', 'sku', 'oem', 'search_text']);
             $table->timestamps();
         });
     }

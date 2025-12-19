@@ -19,11 +19,20 @@ class ProductSeeder extends Seeder
         $json = Storage::disk('public')->get('univexnav_item.json');
         $products = json_decode($json, true);
 
-        $productsData = collect($products[2]['data']);
+        $productsData = [];
 
-// Предзагружаем все manufacture за один запрос
+        foreach ($products[2]['data'] as $item) {
+            $key = $item['IDSite'];
+            if (!isset($productsData[$key])) {
+                $productsData[$key] = $item;
+            }
+        }
+
+        $productsData = collect(array_values($productsData));
+
+
         $manufactureCodes = $productsData->pluck('ManID')->unique()->filter();
-        $manufactures = Manufacturer::whereIn('code', $manufactureCodes)
+        $manufactures = Manufacturer::query()->whereIn('code', $manufactureCodes)
             ->get()
             ->keyBy('code');
 
@@ -57,7 +66,7 @@ class ProductSeeder extends Seeder
 // Подготавливаем данные для массовой вставки
         $productsToInsert = $productsData->map(function ($product) use ($manufactures, $warehouseStatuses, $orderStatusMap, $formatDecimal) {
             $manufacture = $manufactures->get($product['ManID']);
-            $statusName = $orderStatusMap[$product['Order']] ?? null;
+            $statusName = $orderStatusMap[$product['order']] ?? null;
             $status = $statusName ? $warehouseStatuses->get($statusName) : null;
 
             return [
@@ -67,22 +76,21 @@ class ProductSeeder extends Seeder
                 'search_text' => $product['MatchCode'],
                 'on_sale' => $product['Sale'],
                 'sale_discount' => $formatDecimal($product['sDiscount'] ?? 0),
-                'min_order_quantity' => (int)$product['MinQTY'],
+                'min_order_quantity' => (int)$product['minQty'],
                 'product_warehouse_status_id' => $status->id ?? null,
                 'manufacturer_id' => $manufacture->id ?? null,
                 'code' => $product['IDSite'],
-                'price_code' => $product['IDPrice'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
         })->filter(function ($product) {
             // Фильтруем записи где нет обязательных данных
-            return !empty($product['sku']) && !empty($product['name']);
-        })->chunk(1000); // Разбиваем на части для вставки
+            return !empty($product['sku']) && !empty($product['name']) && $product['product_warehouse_status_id'] != 3;
+        })->chunk(5000); // Разбиваем на части для вставки
 
 // Массовая вставка частями
         foreach ($productsToInsert as $chunk) {
-            Product::insert($chunk->toArray());
+            Product::query()->insert($chunk->toArray());
         }
     }
 }

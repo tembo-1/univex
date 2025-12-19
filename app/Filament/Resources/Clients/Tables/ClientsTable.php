@@ -16,51 +16,93 @@ class ClientsTable
         return $table
             ->columns([
                 TextColumn::make('user_id')
+                    ->label('ID')
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('client_status_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->alignCenter()
+                    ->width(50),
+
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Название')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
+
                 TextColumn::make('short_name')
-                    ->searchable(),
+                    ->label('Краткое название')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30),
+
                 TextColumn::make('inn')
-                    ->searchable(),
+                    ->label('ИНН')
+                    ->searchable()
+                    ->copyable()
+                    ->copyMessage('ИНН скопирован')
+                    ->alignCenter()
+                    ->width(100),
+
                 TextColumn::make('kpp')
-                    ->searchable(),
+                    ->label('КПП')
+                    ->searchable()
+                    ->alignCenter()
+                    ->width(100),
+
                 TextColumn::make('ogrn')
-                    ->searchable(),
+                    ->label('ОГРН')
+                    ->searchable()
+                    ->alignCenter()
+                    ->width(120),
+
                 TextColumn::make('head_name')
-                    ->searchable(),
+                    ->label('Руководитель')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30),
+
                 TextColumn::make('head_position')
-                    ->searchable(),
+                    ->label('Должность')
+                    ->searchable()
+                    ->toggleable()
+                    ->limit(25),
+
                 TextColumn::make('first_name')
-                    ->searchable(),
+                    ->label('Имя')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('last_name')
-                    ->searchable(),
+                    ->label('Фамилия')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('middle_name')
-                    ->searchable(),
+                    ->label('Отчество')
+                    ->searchable()
+                    ->toggleable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Создан')
+                    ->dateTime('d.m.Y H:i')
                     ->sortable()
+                    ->alignCenter()
+                    ->width(130)
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Обновлен')
+                    ->dateTime('d.m.Y H:i')
                     ->sortable()
+                    ->alignCenter()
+                    ->width(130)
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+//                ViewAction::make(),
+//                EditAction::make(),
             ])
             ->deferLoading();
     }

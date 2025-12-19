@@ -252,9 +252,16 @@
             });
         });
     });
+
+    window.d = 13631490;
 </script>
 @stack('scripts')
+@livewire('toast')
 @livewireScripts
+
 @livewire('notification-display')
+
+<template id="errors-code" data-filemax="Количество загружаемых файлов не должно превышать 5" data-filetype="Не является изображением" data-filesize="Превышает максимальный объем файла в 1.3мб" data-size="1363149" data-max="5"></template>
+
 </body>
 </html>

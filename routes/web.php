@@ -2,9 +2,14 @@
 
 use App\Livewire\Auth\LoginModal;
 use App\Livewire\BasketPage;
+use App\Livewire\NotepadItemsPage;
 use App\Livewire\OrdersPage;
 use App\Livewire\Page\BasePage;
 use App\Livewire\Page\CabinetPage;
+use App\Livewire\Page\ContactPage;
+use App\Livewire\Page\NotepadPage;
+use App\Livewire\Page\OrderItemsPage;
+use App\Livewire\Page\RefundsPage;
 use App\Livewire\Pages\AboutPage;
 use App\Livewire\Pages\CatalogPage;
 use App\Livewire\Pages\HomePage;
@@ -16,6 +21,8 @@ use App\Livewire\Pages\PostsPage;
 use App\Livewire\Pages\ProductPage;
 use App\Livewire\Pages\RefundPage;
 use App\Livewire\Pages\RequisitesPage;
+use App\Livewire\Popups\CallbackPopup;
+use App\Livewire\Popups\NotepadPopup;
 use App\Livewire\Popups\ResumePopup;
 use App\Livewire\ProfilePage;
 use App\Livewire\VacancyPage;
@@ -31,19 +38,26 @@ Route::get('/pdf-catalogs',         PdfCatalogsPage::class)->name('pdfCatalogs')
 Route::get('/about',                AboutPage::class)->name('about');
 Route::get('/requisites',           RequisitesPage::class)->name('requisites');
 Route::get('/vacancies',            VacancyPage::class)->name('vacancies');
+Route::get('/contacts',             ContactPage::class)->name('contacts');
 
 Route::get('/refund',               RefundPage::class)->name('refund');
 
 // С авторизацией клиента
 Route::get('/cabinet',              CabinetPage::class)->name('cabinet');
 Route::get('/basket',               BasketPage::class)->name('basket');
+Route::get('/refunds',              RefundsPage::class)->name('refunds');
 Route::get('/orders',               OrdersPage::class)->name('orders');
+Route::get('/orders/{id}',          OrderItemsPage::class)->name('orders.show');
 Route::get('/profile',              ProfilePage::class)->name('profile');
+Route::get('/notepad',              NotepadPage::class)->name('notepad');
+Route::get('/notepad/{id}',         NotepadItemsPage::class)->name('notepad.items');
 
 //Route::fallback(                        NotFoundPage::class);
 Route::get('/404',                  NotFoundPage::class)->name('404');
 
 Route::get('/popup/login',          LoginModal::class)->name('popup.login');
 Route::get('/popup/resume',         ResumePopup::class)->name('popup.resume');
+Route::get('/popup/notepad',        NotepadPopup::class)->name('popup.notepad');
+Route::get('/popup/callback',       CallbackPopup::class)->name('popup.callback');
 
 Route::get('/{slug}',               BasePage::class)->name('page');

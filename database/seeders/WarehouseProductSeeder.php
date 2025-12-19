@@ -19,51 +19,53 @@ class WarehouseProductSeeder extends Seeder
     public function run(): void
     {
         $items = json_decode(Storage::disk('public')->get('univexnav_iteminventory.json'), true);
-        $items = collect($items[2]['data']);
 
-        $results = collect();
+        // Получаем уникальные коды через коллекции
+        $allItems = collect($items[2]['data']);
 
-        $warehouses = Warehouse::all()->keyBy('code');
+        $warehouseCodes = $allItems->pluck('LocationCode')->unique()->values();
+        $productCodes = $allItems->pluck('IDSite')->unique()->values();
 
-        $items->chunk(10000)->each(function ($chunk, $key) use (&$results, $warehouses) {
-            $productPrices = ProductPrice::query()
-                ->whereIn('code', $chunk->pluck('IDPrice'))
-                ->select(['id', 'code'])
-                ->get()
-                ->keyBy('code');
-
-            $chunkResults = $chunk->map(function ($item) use ($productPrices, $warehouses) {
-
-                if (!isset($productPrices[$item['IDPrice']]) ||
-                    !isset($warehouses[$item['LocationCode']])) {
-                    return null;
-                }
-
-                return [
-                    'product_price_id'  => $productPrices[$item['IDPrice']]->id,
-                    'warehouse_id'      => $warehouses[$item['LocationCode']]->id,
-                    'quantity'          => (int)$item['Quantity'],
-                ];
-            });
-
-            $results = $results->merge($chunkResults);
-            echo $key . PHP_EOL;
-            // Освобождаем память
-            unset($products, $chunkResults);
+        // Пакетная загрузка продуктов
+        $products = collect();
+        $productCodes->chunk(20000)->each(function ($chunk) use (&$products) {
+            Product::query()
+                ->whereIn('code', $chunk)
+                ->select('id', 'code')
+                ->cursor()
+                ->each(function ($product) use (&$products) {
+                    $products[$product->code] = $product->id;
+                });
         });
 
-        DB::transaction(function () use ($results) {
-            $results->chunk(10000)->each(function ($chunk, $key) {
-                try {
-                    $attemptedCount = $chunk->count();
-                    $insertedCount = WarehouseProduct::query()->insertOrIgnore($chunk->toArray());
+        // Пакетная загрузка складов
+        $warehouses = collect();
+        $warehouseCodes->chunk(20000)->each(function ($chunk) use (&$warehouses) {
+            Warehouse::query()
+                ->whereIn('code', $chunk)
+                ->select('id', 'code')
+                ->cursor()
+                ->each(function ($warehouse) use (&$warehouses) {
+                    $warehouses[$warehouse->code] = $warehouse->id;
+                });
+        });
 
-                    echo 'Вставка: ' . $key . PHP_EOL;
+        // Обрабатываем пакетами
+        $allItems->chunk(5000)->each(function ($chunk) use ($products, $warehouses) {
+            $warehouseProducts = $chunk->map(function ($item) use ($products, $warehouses) {
+                $productId = $products[$item['IDSite']] ?? null;
+                $warehouseId = $warehouses[$item['LocationCode']] ?? null;
 
-                } catch (\Throwable $throwable) {
-                    return;
-                }
-            });
+                return $productId && $warehouseId ? [
+                    'product_id' => $productId,
+                    'warehouse_id' => $warehouseId,
+                    'quantity' => $item['Quantity'],
+                ] : null;
+            })->filter()->values()->toArray();
+
+            if (!empty($warehouseProducts)) {
+                WarehouseProduct::query()->insertOrIgnore($warehouseProducts);
+            }
         });
     }
 }

@@ -149,25 +149,25 @@ class MailingCampaignForm
                             ->columnSpanFull(),
                     ]),
 
-                // Получатели (если не "всем")
-                Section::make('Получатели')
-                    ->schema([
-                        Select::make('user_roles')
-                            ->label('Роли пользователя')
-                            ->required()
-                            ->multiple()
-                            ->searchable()
-                            ->preload()
-                            ->helperText('Выберите роли для этого менеджера')
-                            ->suffixIcon('heroicon-m-shield-check')
-                            ->options(function ($record) {
-                                return User::query()
-                                    ->find(24)
-                                    ->pluck('email', 'id')
-                                    ->toArray();
-                            })
-                            ->rules(['array']),
-                    ])->hidden(fn(Get $get) => $get('send_to_all')),
+//                // Получатели (если не "всем")
+//                Section::make('Получатели')
+//                    ->schema([
+//                        Select::make('user_roles')
+//                            ->label('Роли пользователя')
+//                            ->required()
+//                            ->multiple()
+//                            ->searchable()
+//                            ->preload()
+//                            ->helperText('Выберите роли для этого менеджера')
+//                            ->suffixIcon('heroicon-m-shield-check')
+//                            ->options(function ($record) {
+//                                return User::query()
+//                                    ->find(24)
+//                                    ->pluck('email', 'id')
+//                                    ->toArray();
+//                            })
+//                            ->rules(['array']),
+//                    ])->hidden(fn(Get $get) => $get('send_to_all')),
             ]);
     }
 }

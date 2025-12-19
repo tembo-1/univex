@@ -19,7 +19,9 @@ class NotificationDisplay extends Component
 
     public function loadNotifications()
     {
-        $this->notifications = Notification::where('is_active', true)
+        $this->notifications = Notification::query()
+            ->where('is_active', true)
+            ->where('notification_type_id', 1)
             ->whereNotIn('id', $this->hiddenNotifications)
             ->latest()
             ->get();

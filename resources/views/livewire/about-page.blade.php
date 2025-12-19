@@ -105,7 +105,7 @@
                         <time datetime="2016-11-18T09:54" class="location__top-title">{{ setting('site_working_hours') }}</time>
                     </div>
                 </div>
-                <a href="#" class="location__top-btn btn btn--alt btn--icon" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Перезвоните нам</a>
+                <a href="{{ route('popup.callback') }}" data-popup="#callback-popupTwo" class="location__top-btn btn btn--alt btn--icon" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Перезвоните нам</a>
             </div>
             <div class="location__inner">
                 <div class="location__info fade-up" data-watch data-watch-once>

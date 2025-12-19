@@ -31,10 +31,10 @@
                                 </h2>
                             </div>
                             <div class="quest-block__content">
-                                <form action="#" class="quest-block__form form">
+                                <form class="quest-block__form form" wire:submit.prevent="add()">
                                     <div class="form__search">
                                         <div class="form__search-input">
-                                            <input autocomplete="off" type="text" name="form[]" data-error="Ошибка" placeholder="Артикул..." class="input">
+                                            <input wire:model="skuInput" autocomplete="off" type="text" name="form[]" data-error="Ошибка" placeholder="Артикул..." class="input">
                                         </div>
                                         <button type="submit" class="form__search-icon" style='--icon:url(&quot;/img/icons/15.svg&quot;)'></button>
                                     </div>
@@ -42,16 +42,16 @@
                                         <div data-quantity class="form__quantity quantity">
                                             <button data-quantity-minus type="button" class="quantity__button quantity__button--minus"></button>
                                             <div class="quantity__input">
-                                                <input data-quantity-value autocomplete="off" type="number" name="form[]" value="1">
+                                                <input wire:model="qtyInput" data-quantity-value autocomplete="off" type="number" name="form[]" value="1">
                                             </div>
                                             <button
 
                                                 data-quantity-plus type="button" class="quantity__button quantity__button--plus"></button>
                                         </div>
-                                        <a wire:click.prevent="add"
-                                           href="javascript:void(0)"
+                                        <button
+                                            type="submit"
                                            class="form__basket"
-                                           style='--icon:url(&quot;/img/icons/basket.svg&quot;)'></a>
+                                           style='--icon:url(&quot;/img/icons/basket.svg&quot;)'></button>
                                     </div>
                                 </form>
                             </div>
@@ -100,17 +100,17 @@
                                             <div class="table-block__row">
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <a href="javascript:void(0)" class="table-block__text">{{ $cartItem->warehouseProduct->productPrice->product->sku }}</a>
+                                                        <a href="javascript:void(0)" class="table-block__text">{{ $cartItem->warehouseProduct->product->sku }}</a>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <a href="javascript:void(0)" class="table-block__text">{{ $cartItem->warehouseProduct->productPrice->product->manufacturer->name }}</a>
+                                                        <a href="javascript:void(0)" class="table-block__text">{{ $cartItem->warehouseProduct->product->manufacturer->name }}</a>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column table-block__column--big">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">{{ $cartItem->warehouseProduct->productPrice->product->name }}</div>
+                                                        <div class="table-block__text">{{ $cartItem->warehouseProduct->product->name }}</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column" style="flex-direction: row">
@@ -189,79 +189,107 @@
                                 </div>
                             </div>
                         </div>
-{{--                        <a href="javascript:void(0)" class="manufacturer__btn btn btn--blue btn--icon" style='--icon:url(&quot;/img/icons/03.svg&quot;)'>Пересчитать цены</a>--}}
                     </div>
-                    <div wire:ignore>
+                    <div wire:ignore.self>
                         <div class="manufacturer__block" data-watch data-watch-once>
                             <h3 class="manufacturer__subtitle">Доставка заказа</h3>
-                            <form action="#" class="manufacturer__choice">
+                            <form wire:submit.prevent="placeOrder" class="manufacturer__choice">
+                                <!-- Тип доставки: самовывоз -->
                                 <fieldset class="manufacturer__choice-block">
                                     <div class="manufacturer__choice-checkbox checkbox">
-                                        <input id="csdfs_1" data-error="Ошибка" class="checkbox__input" type="radio" value="1" name="form[]" checked>
-                                        <label for="csdfs_1" class="checkbox__label">
+                                        <input wire:model="deliveryType"
+                                               id="delivery_pickup"
+                                               class="checkbox__input"
+                                               type="radio"
+                                               value="pickup"
+                                               name="delivery_type">
+                                        <label for="delivery_pickup" class="checkbox__label">
                                             <span class="checkbox__text">Самовывоз со склада</span>
                                         </label>
                                     </div>
-                                    <div class="manufacturer__choice-hidden" hidden>
+
+                                    <div class="manufacturer__choice-hidden" @if($deliveryType !== 'pickup') hidden @endif>
                                         <div class="manufacturer__choice-inner">
                                             <div class="manufacturer__choice-row">
-                                                <div class="manufacturer__choice-column">
-                                                    <div class="manufacturer__choice-checkbox checkbox">
-                                                        <input id="csdfsdfsdfs_1" data-error="Ошибка" class="checkbox__input" type="radio" value="1" name="form[]1">
-                                                        <label for="csdfsdfsdfs_1" class="checkbox__label"></label>
-                                                    </div>
-                                                    <div class="manufacturer__choice-info">
-                                                        <address class="manufacturer__choice-address">мкр. Востряково, ул.Вокзальная, стр. 59В</address>
-                                                        <div class="manufacturer__choice-take">Забирайте 28 июня, после 11:00
+                                                @foreach($deliveryAddresses as $deliveryAddress)
+                                                    <div class="manufacturer__choice-column">
+                                                        <div class="manufacturer__choice-checkbox checkbox">
+                                                            <input wire:model="address"
+                                                                   id="address_{{ $deliveryAddress->id }}"
+                                                                   class="checkbox__input"
+                                                                   type="radio"
+                                                                   value="{{ $deliveryAddress->address }}"
+                                                                   name="selected_address_id">
+                                                            <label for="address_{{ $deliveryAddress->id }}" class="checkbox__label"></label>
                                                         </div>
-                                                        <time datetime="2016-11-18T09:54" class="manufacturer__choice-time">пн.-вс.: с 9:00 до 20:00</time>
-                                                    </div>
-                                                </div>
-                                                <div class="manufacturer__choice-column">
-                                                    <div class="manufacturer__choice-checkbox checkbox">
-                                                        <input id="csdfsdfsdfs_2" data-error="Ошибка" class="checkbox__input" type="radio" value="1" name="form[]1">
-                                                        <label for="csdfsdfsdfs_2" class="checkbox__label"></label>
-                                                    </div>
-                                                    <div class="manufacturer__choice-info">
-                                                        <address class="manufacturer__choice-address">мкр. Востряково, ул.Вокзальная, стр. 59В</address>
-                                                        <div class="manufacturer__choice-take">Забирайте 28 июня, после 11:00
+                                                        <div class="manufacturer__choice-info">
+                                                            <address class="manufacturer__choice-address">
+                                                                {{ $deliveryAddress->address }}
+                                                            </address>
+                                                            <div class="manufacturer__choice-take">
+                                                                Забирайте 28 июня, после 11:00
+                                                            </div>
+                                                            <time datetime="2016-11-18T09:54" class="manufacturer__choice-time">
+                                                                {{ $deliveryAddress->working_hours }}
+                                                            </time>
                                                         </div>
-                                                        <time datetime="2016-11-18T09:54" class="manufacturer__choice-time">пн.-вс.: с 9:00 до 20:00</time>
                                                     </div>
-                                                </div>
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>
                                 </fieldset>
+
+                                <!-- Тип доставки: доставка -->
                                 <fieldset class="manufacturer__choice-block">
                                     <div class="manufacturer__choice-checkbox checkbox">
-                                        <input id="csdfs_2" data-error="Ошибка" class="checkbox__input" type="radio" value="1" name="form[]">
-                                        <label for="csdfs_2" class="checkbox__label">
-														<span class="checkbox__text">Доставка
-														</span>
+                                        <input wire:model="deliveryType"
+                                               id="delivery_home"
+                                               class="checkbox__input"
+                                               type="radio"
+                                               value="delivery"
+                                               name="delivery_type">
+                                        <label for="delivery_home" class="checkbox__label">
+                                            <span class="checkbox__text">Доставка</span>
                                         </label>
                                     </div>
-                                    <div class="manufacturer__choice-hidden" hidden>
+
+                                    <div class="manufacturer__choice-hidden" @if($deliveryType !== 'delivery') hidden @endif>
                                         <div class="manufacturer__choice-inner">
                                             <div class="manufacturer__choice-items">
                                                 <div class="manufacturer__choice-item item-manufacturer">
                                                     <div class="item-manufacturer__title">Адрес доставки</div>
                                                     <div class="item-manufacturer__textarea">
-                                                        <textarea class="input" placeholder="Введите что-то..." data-autoheight data-autoheight-min="91" data-autoheight-max="300"></textarea>
+                            <textarea wire:model="address"
+                                      class="input"
+                                      placeholder="Введите адрес доставки..."
+                                      data-autoheight
+                                      data-autoheight-min="91"
+                                      data-autoheight-max="300"></textarea>
                                                     </div>
                                                 </div>
                                                 <div class="manufacturer__choice-item item-manufacturer">
-                                                    <div class="item-manufacturer__title">Коментарий
-                                                    </div>
+                                                    <div class="item-manufacturer__title">Комментарий</div>
                                                     <div class="item-manufacturer__textarea">
-                                                        <textarea class="input" placeholder="Введите что-то..." data-autoheight data-autoheight-min="91" data-autoheight-max="300"></textarea>
+                            <textarea wire:model="comment"
+                                      class="input"
+                                      placeholder="Введите комментарий..."
+                                      data-autoheight
+                                      data-autoheight-min="91"
+                                      data-autoheight-max="300"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </fieldset>
-                                <button type="button" class="manufacturer__btn manufacturer__btn--two btn btn--blue">Оформить заказ</button>
+
+                                @if($hasMore)
+                                    <button type="submit"
+                                            class="manufacturer__btn manufacturer__btn--two btn btn--blue">
+                                        Оформить заказ
+                                    </button>
+                                @endif
                             </form>
                         </div>
                     </div>

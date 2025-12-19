@@ -15,7 +15,7 @@ class ManufactureViewsTable
     {
         return $table
             ->columns([
-                TextColumn::make('manufacture.name')
+                TextColumn::make('manufacturer.name')
                     ->label('Категория')
                     ->searchable()
                     ->sortable()

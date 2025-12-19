@@ -13,7 +13,7 @@ class ProductPrice extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function getPriceAttribute()
+    public function getCleanPriceAttribute()
     {
         return $this->price / 100.0;
     }
