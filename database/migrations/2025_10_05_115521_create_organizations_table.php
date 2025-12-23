@@ -19,9 +19,18 @@ return new class extends Migration
             $table->decimal('personal_discount', 5, 2)->default(0.00);       // Персональная скидка
             $table->string('name');                    // Полное наименование
             $table->string('short_name');              // Краткое наименование
-            $table->string('inn')->unique();           // ИНН (уникальный)
+            $table->string('inn');           // ИНН (уникальный)
             $table->string('kpp');                     // КПП
-            $table->string('ogrn');                    // ОГРН
+            $table->string('ogrn')->nullable();                    // ОГРН
+
+            $table->string('marketing_email')->nullable();                    // ОГРН
+            $table->string('is_send_price_list')->nullable();
+            $table->string('is_send_bulk_price_list')->nullable();
+            $table->string('payment_terms')->nullable();                    // ОГРН
+            $table->boolean('is_store')->nullable();                    // ОГРН
+            $table->string('agreement_number')->nullable();                    // ОГРН
+            $table->timestamp('agreement_date')->nullable();                    // ОГРН
+
             $table->text('legal_address');             // Юридический адрес
             $table->text('postal_address')->nullable(); // Почтовый адрес
             $table->string('head_name')->nullable();               // ФИО руководителя

@@ -21,6 +21,6 @@ class RefundItem extends Model
 
     public function getTotalAmountAttribute(): int
     {
-        return $this->orderItem->unit_price * $this->quantity;
+        return ($this->orderItem->unit_price * $this->quantity) / 100.0;
     }
 }

@@ -1,9 +1,7 @@
-{{-- resources/views/livewire/auth/login-form.blade.php --}}
 <form wire:submit.prevent="submit" class="popup__form form">
     <div class="form__blocks">
         <div class="form__block">
             <div class="form__block-items">
-                {{-- Email поле --}}
                 <div class="form__block-item">
                     <div class="form__block-input">
                         <label class="form__block-label">E-mail</label>
@@ -21,7 +19,6 @@
                     </div>
                 </div>
 
-                {{-- Пароль поле с глазиком --}}
                 <div class="form__block-item" style='--password:url(&quot;/img/icons/77.svg&quot;); --show:url(&quot;/img/icons/78.svg&quot;);'>
                     <div class="form__block-input js-password">
                         <label class="form__block-label">Пароль</label>
@@ -31,7 +28,6 @@
                             class="input js-password-field"
                             type="password"
                         >
-                        {{-- Глазик как в верстке --}}
                         <button
                             type="button"
                             class="form__item-password js-password-toggle"
@@ -53,8 +49,14 @@
             @endif
 
             <div class="form__block-bottom form__block-bottom--two">
-                <a href="javascript:void(0)" class="form__block-link">Регистрация</a>
-                <a href="javascript:void(0)" class="form__block-link">Забыли пароль?</a>
+                <a
+                    href="{{ route('popup.register') }}"
+                    data-popup="#callback-popupSix"
+                    class="form__block-link">Регистрация</a>
+                <a
+                    href="{{ route('popup.forgot') }}"
+                    data-popup="#callback-popupFour"
+                    class="form__block-link">Забыли пароль?</a>
 
                 <button type="submit" class="form__block-btn btn" wire:loading.attr="disabled">
                     <span>Войти</span>

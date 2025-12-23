@@ -83,6 +83,16 @@ return [
             ]) : [],
         ],
 
+        'external' => [
+            'driver' => 'mysql',
+            'host' => env('EXTERNAL_DB_HOST'),
+            'port' => env('EXTERNAL_DB_PORT', 3306),
+            'database' => env('EXTERNAL_DB_DATABASE'),
+            'username' => env('EXTERNAL_DB_USERNAME'),
+            'password' => env('EXTERNAL_DB_PASSWORD'),
+            // ... остальные настройки
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),

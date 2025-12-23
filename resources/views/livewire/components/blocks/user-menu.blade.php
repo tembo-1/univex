@@ -11,7 +11,7 @@
     <a href="{{ route('notepad') }}" class="cabinet__info-item @if($route == 'notepad') _active @endif" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>
         <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/64.svg&quot;)'>Блокнот</div>
     </a>
-    <a href="{{ route('profile') }}" class="cabinet__info-item @if($route == 'profile') _active @endif" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>
-        <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/65.svg&quot;)'>Профиль</div>
-    </a>
+{{--    <a href="{{ route('profile') }}" class="cabinet__info-item @if($route == 'profile') _active @endif" style='--icon:url(&quot;/img/icons/61.svg&quot;)'>--}}
+{{--        <div class="cabinet__info-name" style='--icon:url(&quot;/img/icons/65.svg&quot;)'>Профиль</div>--}}
+{{--    </a>--}}
 </div>

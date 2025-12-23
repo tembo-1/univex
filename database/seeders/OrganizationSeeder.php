@@ -69,10 +69,10 @@ class OrganizationSeeder extends Seeder
                     BankAccount::query()
                         ->create([
                             'client_id'                 => $organizationModel->id,
-                            'bank_name'                 => $organization['bName'],
-                            'bik'                       => $organization['BIC'],
-                            'payment_account'           => $organization['RasSchet'],
-                            'correspondent_account'     => $organization['CorrSchet'],
+                            'bank_name'                 => $organization['bName'] ?: null,
+                            'bik'                       => $organization['BIC'] ?: null,
+                            'payment_account'           => $organization['RasSchet'] ?: null,
+                            'correspondent_account'     => $organization['CorrSchet'] ?: null,
                             'is_default'                => 1,
                         ]);
                 } catch (\Throwable) {

@@ -149,7 +149,7 @@ class RefundForm
 
                         Fieldset::make('Чат по возврату')
                             ->schema([
-                                Livewire::make('refund-chat')
+                                Livewire::make('components.blocks.refund-chat')
                                     ->key(fn ($record) => 'refund-chat-' . ($record?->id ?: 'new'))
                                     ->columnSpanFull(),
                             ]),

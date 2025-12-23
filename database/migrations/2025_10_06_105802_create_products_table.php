@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignId('manufacturer_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('product_warehouse_status_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
 
-            $table->string('code');
+            $table->string('code')->unique();
 
             $table->index('code');
 

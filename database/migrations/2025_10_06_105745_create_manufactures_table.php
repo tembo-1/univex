@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_visible')->default(true);
             $table->integer('position')->default(0);
 
-            $table->string('code')->nullable();
+            $table->string('code')->unique();
 
             $table->timestamps();
 
