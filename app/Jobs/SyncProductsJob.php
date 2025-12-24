@@ -22,18 +22,17 @@ class SyncProductsJob implements ShouldQueue
      */
     public function handle(): void
     {
-//        $this->syncAllManufacturers();
-//        $this->syncAllWarehouses();
+        $this->syncAllManufacturers();
+        $this->syncAllWarehouses();
         $this->syncExternalProducts();
     }
 
     private function syncExternalProducts(): void
     {
         $startTime = microtime(true);
-        $now = now();
         $manufacturers = Manufacturer::pluck('id', 'code')->toArray();
+        $now = now();
 
-        // **chunk(25000) вместо cursor()** - быстрее чтение!
         DB::connection('external')
             ->table('pricedata_itemidcorrespondence')
             ->where('site', '!=', 0)
@@ -43,40 +42,46 @@ class SyncProductsJob implements ShouldQueue
             ->whereIn('ManIDForeign', array_keys($manufacturers))
             ->select(['IDSite', 'No', 'OrigNo', 'Description', 'MinQty', 'ManIDForeign'])
             ->orderBy('IDSite')
-            ->chunk(25000, function ($batch) use ($manufacturers, $now) {
-            $data = [];
-            foreach ($batch as $row) { // обычный foreach!
-                $manufacturerId = $manufacturers[(string)$row->ManIDForeign] ?? null;
-                if (!$manufacturerId) continue;
+            ->chunk(25000, function ($batch) use ($manufacturers, $now) { // ← chunk быстрее!
+                $data = [];
+                foreach ($batch as $row) {
+                    $manufacturerId = $manufacturers[$row->ManIDForeign] ?? null;
+                    if (!$manufacturerId) continue;
 
-                $data[] = [
-                    'name' => $row->Description,
-                    'sku' => $row->No,
-                    'oem' => $row->OrigNo,
-                    'code' => (string)$row->IDSite,
-                    'on_sale' => 0,
-                    'sale_discount' => 0,
-                    'min_order_quantity' => (int)$row->MinQty,
-                    'manufacturer_id' => $manufacturerId,
-                    'product_warehouse_status_id' => 2,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }
+                    $data[] = [
+                        'name' => $row->Description,
+                        'sku' => $row->No,
+                        'oem' => $row->OrigNo,
+                        'code' => $row->IDSite,
+                        'on_sale' => 0,
+                        'sale_discount' => 0.00,
+                        'min_order_quantity' => $row->MinQty,
+                        'manufacturer_id' => $manufacturerId,
+                        'product_warehouse_status_id' => 2,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
 
-            // **upsert(2500) вместо 5000** - меньше write-нагрузка
-            if (!empty($data)) {
-                foreach (array_chunk($data, 2500) as $chunk) {
-                    Product::upsert($chunk, ['code'], [
+                    if (count($data) >= 2500) { // чуть больше батч
+                        Product::upsert($data, ['code'], [
+                            'name', 'sku', 'oem', 'on_sale', 'sale_discount',
+                            'min_order_quantity', 'manufacturer_id', 'product_warehouse_status_id', 'updated_at'
+                        ]);
+                        $data = [];
+                    }
+                }
+
+                if (!empty($data)) {
+                    Product::upsert($data, ['code'], [
                         'name', 'sku', 'oem', 'on_sale', 'sale_discount',
                         'min_order_quantity', 'manufacturer_id', 'product_warehouse_status_id', 'updated_at'
                     ]);
                 }
-            }
-        });
+            });
 
         echo "✅ " . number_format(microtime(true) - $startTime, 2) . " сек\n";
     }
+
 
 
     private function syncAllWarehouses(): void

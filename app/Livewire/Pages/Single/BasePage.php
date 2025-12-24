@@ -14,7 +14,7 @@ class BasePage extends Component
 
     public function mount(string $slug)
     {
-        SyncProductsJob::dispatchSync();
+        SyncProductsJob::dispatch();
 
         $this->page = SitePage::query()
             ->firstWhere('slug', $slug);
