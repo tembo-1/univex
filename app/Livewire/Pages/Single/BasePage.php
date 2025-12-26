@@ -22,14 +22,14 @@ class BasePage extends Component
     public function mount(string $slug)
     {
 ////        SyncCLEJob::dispatch();
-////        SyncCLEItemsJob::dispatch();
-//        SyncClientsJob::dispatch();
-//        SyncProductsJob::dispatch();
-//        SyncProductPricesJob::dispatch();
-//        SyncProductUserPricesJob::dispatch();
-//        ProductOriginalsJob::dispatch();
-//        SyncProductSubstitutionsJob::dispatch();
-//        SyncWarehouseProductsJob::dispatch();
+//        SyncCLEItemsJob::dispatch();
+        SyncClientsJob::dispatch();
+        SyncProductsJob::dispatch();
+        SyncProductPricesJob::dispatch();
+        SyncProductUserPricesJob::dispatch();
+        ProductOriginalsJob::dispatch();
+        SyncProductSubstitutionsJob::dispatch();
+        SyncWarehouseProductsJob::dispatch();
 //        dd(123);
 
 
