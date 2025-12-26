@@ -14,10 +14,5 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
 
-
-            // Редирект на главную (или куда нужно)
-            return redirect('/')->back();
-        });
     })->create();

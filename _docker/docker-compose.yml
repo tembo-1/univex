@@ -87,7 +87,7 @@ services:
         command: server /data --console-address ":9001"
         environment:
             MINIO_ROOT_USER: minio
-            MINIO_ROOT_PASSWORD: rootroot
+            MINIO_ROOT_PASSWORD: zYrd_gKX58
         volumes:
             - minio-univex:/data
         networks:
@@ -107,21 +107,21 @@ services:
         networks:
             - app-network
 
-    phpmyadmin1:
-        image: phpmyadmin:latest
-        container_name: pma1
-        ports:
-            - "8876:80"
-        environment:
-            PMA_HOST: mysql
-            UPLOAD_MAX_FILESIZE: 512M
-            POST_MAX_SIZE: 512M
-            MAX_EXECUTION_TIME: 3000
-            PMA_ARBITRARY: 0
-        depends_on:
-            - mysql
-        networks:
-            - app-network
+#    phpmyadmin1:
+#        image: phpmyadmin:latest
+#        container_name: pma1
+#        ports:
+#            - "8876:80"
+#        environment:
+#            PMA_HOST: mysql
+#            UPLOAD_MAX_FILESIZE: 512M
+#            POST_MAX_SIZE: 512M
+#            MAX_EXECUTION_TIME: 3000
+#            PMA_ARBITRARY: 0
+#        depends_on:
+#            - mysql
+#        networks:
+#            - app-network
 
     redis:
         container_name: redis
