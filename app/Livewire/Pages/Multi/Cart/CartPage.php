@@ -132,6 +132,7 @@ class CartPage extends Component
                     'user_id' => auth()->id(),
                     'order_status_id' => 1,
                     'shipping_address' => $this->address,
+                    'comment' => $this->comment,
                 ]);
 
             $this->cartItems->each(function (CartItem $cartItem) use ($order) {
