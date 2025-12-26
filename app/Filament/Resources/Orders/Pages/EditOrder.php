@@ -19,8 +19,8 @@ class EditOrder extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('Выгрузка')
-                ->label('Выгрузка заказа'),
+//            Action::make('Выгрузка')
+//                ->label('Выгрузка заказа'),
             Action::make('save')
                 ->label('Сохранить')
                 ->action(function () {

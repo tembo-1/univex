@@ -22,9 +22,9 @@ class NavigationOrderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|null|UnitEnum $navigationGroup = 'Редактор';
-    protected static ?string $navigationLabel = 'Страницы';
-    protected static ?string $modelLabel = 'Страницы';
-    protected static ?string $pluralModelLabel = 'Страницы';
+    protected static ?string $navigationLabel = 'Меню';
+    protected static ?string $modelLabel = 'Меню';
+    protected static ?string $pluralModelLabel = 'Меню';
 
     public static function getNavigationSort(): ?int
     {

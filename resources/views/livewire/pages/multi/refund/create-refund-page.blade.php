@@ -253,12 +253,12 @@
                                     <div class="file-loader__content">
                                         <div class="file-loader__row">
                                             <div class="file-loader__info">
-                                                <div class="file-loader__icon" style='--icon:url(&quot;/img/icons/26.svg&quot;)'></div>
-                                                <input class="file-loader__input visually-hidden" type="file" name="file" accept=".mp4, .mov, .avi, .mkv, .webm, video/mp4, video/quicktime, video/x-msvideo, video/x-matroska, video/webm">
+                                                <div class="file-loader__icon" style='--icon:url(&quot;/img/icons/25.svg&quot;)'></div>
+                                                <input id="file-upload1" class="file-loader__input visually-hidden" type="file" name="file" accept=".png, .jpg, .jpeg, .webp, .heic, image/png, image/jpeg, image/webp, image/heic">
                                                 <div class="file-loader__files"></div>
+
                                             </div>
-                                            <div class="file-loader__title">Видео
-                                            </div>
+                                            <div class="file-loader__title">Фото стикер на упаковке</div>
                                         </div>
                                     </div>
                                     <div class="file-loader__error"></div>
