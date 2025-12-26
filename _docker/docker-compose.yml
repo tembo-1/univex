@@ -93,35 +93,35 @@ services:
         networks:
             - app-network
 
-    phpmyadmin:
-        image: phpmyadmin:latest
-        container_name: pma
-        ports:
-            - "8877:80"
-        environment:
-            PMA_HOST: "89.253.237.41"
-            PMA_PORT: "3310"
-            UPLOAD_MAX_FILESIZE: 512M
-            POST_MAX_SIZE: 512M
-            MAX_EXECUTION_TIME: 3000
-        networks:
-            - app-network
-
-#    phpmyadmin1:
+#    phpmyadmin:
 #        image: phpmyadmin:latest
-#        container_name: pma1
+#        container_name: pma
 #        ports:
-#            - "8876:80"
+#            - "8877:80"
 #        environment:
-#            PMA_HOST: mysql
+#            PMA_HOST: "89.253.237.41"
+#            PMA_PORT: "3310"
 #            UPLOAD_MAX_FILESIZE: 512M
 #            POST_MAX_SIZE: 512M
 #            MAX_EXECUTION_TIME: 3000
-#            PMA_ARBITRARY: 0
-#        depends_on:
-#            - mysql
 #        networks:
 #            - app-network
+
+    phpmyadmin1:
+        image: phpmyadmin:latest
+        container_name: pma1
+        ports:
+            - "8876:80"
+        environment:
+            PMA_HOST: mysql
+            UPLOAD_MAX_FILESIZE: 512M
+            POST_MAX_SIZE: 512M
+            MAX_EXECUTION_TIME: 3000
+            PMA_ARBITRARY: 0
+        depends_on:
+            - mysql
+        networks:
+            - app-network
 
     redis:
         container_name: redis
