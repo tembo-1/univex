@@ -59,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
             scrollbar-width: thin;
             scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
         }
-
+        label[for="form.remember"] { display: none !important; }
         /* Webkit браузеры */
         *::-webkit-scrollbar {
             width: 6px;
