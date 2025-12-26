@@ -33,12 +33,12 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->navigationGroups(
-                NavigationOrder::query()
-                ->orderBy('position')
-                ->pluck('name')
-                ->toArray()
-            )
+//            ->navigationGroups(
+//                NavigationOrder::query()
+//                ->orderBy('position')
+//                ->pluck('name')
+//                ->toArray()
+//            )
             ->login()
             ->authGuard('admin')
             ->colors([
