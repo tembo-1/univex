@@ -65,7 +65,7 @@ class Refund extends Model
     public function getTotalAmountAttribute(): int
     {
         return $this->refundItems->sum(function ($refundItem) {
-            return $refundItem->quantity * $refundItem->orderItem->unit_price;
+            return $refundItem->quantity * $refundItem->orderItem->unitPriceRub;
         });
     }
 }

@@ -25,11 +25,62 @@ class SyncProductsJob implements ShouldQueue
         $this->syncAllManufacturers();
         $this->syncAllWarehouses();
         $this->syncExternalProducts();
+        $this->syncInternalProducts();
+    }
+
+    private function syncInternalProducts()
+    {
+        $manufacturers = Manufacturer::query()->pluck('id', 'code')->toArray();
+        $now = now();
+
+        DB::connection('external')
+            ->table('univexnav_item')
+            ->whereNotNull('IDSite')
+            ->whereNotNull('No')
+            ->whereNotNull('Description')
+            ->select(['IDSite', 'no', 'OrigNo', 'description', 'minQty', 'manID', 'matchCode', 'sale', 'discount', 'order'])
+            ->orderBy('IDSite')
+            ->chunk(5000, function ($batch) use ($manufacturers, $now) {
+                $data = [];
+
+                foreach ($batch as $row) {
+                    $manKey = $row->manID;
+                    if (empty($manKey) || !isset($manufacturers[$manKey])) continue;
+
+                    $data[] = [
+                        'name' => $row->description,
+                        'sku' => $row->no,
+                        'oem' => $row->OrigNo,
+                        'code' => $row->IDSite,
+                        'on_sale' => (bool)$row->sale,
+                        'sale_discount' => (float)$row->discount,
+                        'min_order_quantity' => (int)$row->minQty,
+                        'manufacturer_id' => $manufacturers[$manKey],
+                        'product_warehouse_status_id' => (int)$row->order + 1,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+
+                    if (count($data) >= 1000) {
+                        Product::query()->upsert($data, ['code'], [
+                            'name', 'sku', 'oem', 'on_sale', 'sale_discount',
+                            'min_order_quantity', 'manufacturer_id', 'product_warehouse_status_id', 'updated_at'
+                        ]);
+                        $data = [];
+                    }
+                }
+
+                if (!empty($data)) {
+                    Product::query()->upsert($data, ['code'], [
+                        'name', 'sku', 'oem', 'on_sale', 'sale_discount',
+                        'min_order_quantity', 'manufacturer_id', 'product_warehouse_status_id', 'updated_at'
+                    ]);
+                }
+            });
     }
 
     private function syncExternalProducts(): void
     {
-        $startTime = microtime(true);
         $manufacturers = Manufacturer::pluck('id', 'code')->toArray();
         $now = now();
 
@@ -39,14 +90,14 @@ class SyncProductsJob implements ShouldQueue
             ->whereNotNull('IDSite')
             ->whereNotNull('No')
             ->whereNotNull('Description')
-            ->whereIn('ManIDForeign', array_keys($manufacturers))
             ->select(['IDSite', 'No', 'OrigNo', 'Description', 'MinQty', 'ManIDForeign'])
             ->orderBy('IDSite')
-            ->chunk(25000, function ($batch) use ($manufacturers, $now) { // ← chunk быстрее!
+            ->chunk(5000, function ($batch) use ($manufacturers, $now) { // chunk ↓
                 $data = [];
+
                 foreach ($batch as $row) {
-                    $manufacturerId = $manufacturers[$row->ManIDForeign] ?? null;
-                    if (!$manufacturerId) continue;
+                    $manKey = $row->ManIDForeign;
+                    if (empty($manKey) || !isset($manufacturers[$manKey])) continue;
 
                     $data[] = [
                         'name' => $row->Description,
@@ -55,14 +106,14 @@ class SyncProductsJob implements ShouldQueue
                         'code' => $row->IDSite,
                         'on_sale' => 0,
                         'sale_discount' => 0.00,
-                        'min_order_quantity' => $row->MinQty,
-                        'manufacturer_id' => $manufacturerId,
+                        'min_order_quantity' => (int)$row->MinQty,
+                        'manufacturer_id' => $manufacturers[$manKey],
                         'product_warehouse_status_id' => 2,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
 
-                    if (count($data) >= 2500) { // чуть больше батч
+                    if (count($data) >= 1000) {
                         Product::upsert($data, ['code'], [
                             'name', 'sku', 'oem', 'on_sale', 'sale_discount',
                             'min_order_quantity', 'manufacturer_id', 'product_warehouse_status_id', 'updated_at'
@@ -71,6 +122,7 @@ class SyncProductsJob implements ShouldQueue
                     }
                 }
 
+                // Финальный upsert
                 if (!empty($data)) {
                     Product::upsert($data, ['code'], [
                         'name', 'sku', 'oem', 'on_sale', 'sale_discount',
@@ -78,11 +130,7 @@ class SyncProductsJob implements ShouldQueue
                     ]);
                 }
             });
-
-        echo "✅ " . number_format(microtime(true) - $startTime, 2) . " сек\n";
     }
-
-
 
     private function syncAllWarehouses(): void
     {
@@ -142,7 +190,7 @@ class SyncProductsJob implements ShouldQueue
 
         foreach ($internalManufacturers as $ext) {
             $code = (string)$ext->manID;
-            $name = trim($ext->manName);
+            $name = $ext->manName;
 
             if (empty($name)) continue;
 
@@ -164,7 +212,7 @@ class SyncProductsJob implements ShouldQueue
             ->get();
 
         foreach ($externalManufacturers as $ext) {
-            $manufacturerCode = (string)$ext->ManIDForeign;
+            $manufacturerCode = $ext->ManIDForeign;
             $externalManufacturerName = trim($ext->ManNameForeign);
 
             if (empty($externalManufacturerName)) continue;
@@ -181,7 +229,7 @@ class SyncProductsJob implements ShouldQueue
         }
 
         if (!empty($data)) {
-            foreach (array_chunk($data, 5000) as $chunk) {
+            foreach (array_chunk($data, 1000) as $chunk) {
                 Manufacturer::query()
                     ->upsert(
                         $chunk,

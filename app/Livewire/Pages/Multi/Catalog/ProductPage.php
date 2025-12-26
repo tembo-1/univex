@@ -3,8 +3,10 @@
 namespace App\Livewire\Pages\Multi\Catalog;
 
 use App\Models\Cart;
+use App\Models\ManufacturerView;
 use App\Models\Product;
 use App\Models\ProductSubstitution;
+use App\Models\ProductView;
 use App\Models\WarehouseProduct;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -41,6 +43,11 @@ class ProductPage extends Component
             ->firstWhere('user_id', auth()->id());
 
         $this->addBreadcrumbs();
+
+        ProductView::query()
+            ->updateOrCreate(['product_id' => $this->product->id], ['views_count' => 0])
+            ->increment('views_count');
+
 
         $this->loadProducts();
         $this->loadManufacturers();
@@ -126,6 +133,15 @@ class ProductPage extends Component
 
     public function addToCart(int $id)
     {
+        if (!auth()->check()) {
+            $this->dispatch('showToast',
+                type: 'error',
+                message: 'Сначала авторизуйтесь!'
+            );
+
+            return;
+        }
+
         $warehouseProduct = WarehouseProduct::query()->find($id);
 
         $cart = Cart::query()->firstOrCreate([

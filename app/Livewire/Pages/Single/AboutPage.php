@@ -20,7 +20,6 @@ class AboutPage extends Component
             ->siteBlocks;
 
         $this->manufacturers = Manufacturer::query()
-            ->where('is_visible', 1)
             ->limit(12)
             ->get();
 

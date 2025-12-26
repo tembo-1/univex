@@ -46,7 +46,10 @@ class DatabaseSeeder extends Seeder
             ContactSeeder::class,
             DeliveryAddressSeeder::class,
             ClientLedgerEntryTypeSeeder::class,
-            ClientLedgerEntrySeeder::class,
+            MailingTypeSeeder::class,
+//            ClientLedgerEntrySeeder::class,
+            NavigationOrderSeeder::class,
+            PermissionsSeeder::class,
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');

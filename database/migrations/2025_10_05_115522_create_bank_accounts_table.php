@@ -23,6 +23,8 @@ return new class extends Migration
 
             $table->index('client_id');
             $table->index('bik');
+
+            $table->unique('client_id');
         });
     }
 

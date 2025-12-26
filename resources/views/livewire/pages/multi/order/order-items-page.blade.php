@@ -27,7 +27,10 @@
                 <div class="notebook__btns">
                     <a href="#" class="notebook__link btn btn--gry">Сохранить в Exel</a>
                     <button wire:click="downloadScore" class="notebook__link btn btn--blue">Счет на оплату</button>
-                    <a href="{{ route('orders.edit', $order->id) }}" class="notebook__link btn btn--icon" style='--icon:url(&quot;/img/icons/03.svg&quot;)'>Изменить заказ</a>
+
+                    @if($order->orderStatus->id == 1)
+                        <a href="{{ route('orders.edit', $order->id) }}" class="notebook__link btn btn--icon" style='--icon:url(&quot;/img/icons/03.svg&quot;)'>Изменить заказ</a>
+                    @endif
                 </div>
             </div>
             <div class="notebook__tracking tracking-notebook">
@@ -49,7 +52,7 @@
                     <div class="tracking-notebook__item">
                         <div class="tracking-notebook__title">СТАТУС
                         </div>
-                        <div class="tracking-notebook__btn" style='--bg: #FFF; --color: #5C5C5C'>{{ $order->orderStatus->name }}
+                        <div class="tracking-notebook__btn"   @if($order->orderStatus->id == 1) style='--bg: #6EC53F; --color: #FFFFFF' @else style='--bg: #FFF; --color: #5C5C5C' @endif>{{ $order->orderStatus->name }}
                         </div>
                     </div>
                     <div class="tracking-notebook__item">

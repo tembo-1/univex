@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class SitePagesTable
@@ -69,14 +70,9 @@ class SitePagesTable
                     ->searchable()
                     ->sortable(),
 
-                IconColumn::make('is_active')
-                    ->label('Статус')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->trueColor('success')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->falseColor('danger')
-                    ->sortable(),
+                ToggleColumn::make('is_active')
+                    ->sortable()
+                    ->label('Статус'),
             ])
             ->filters([
                 //

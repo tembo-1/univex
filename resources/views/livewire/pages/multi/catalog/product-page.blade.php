@@ -97,7 +97,10 @@
                         <div class="gallery-block__btns">
                             <a href="javascript:void(0)" class="gallery-block__btn btn btn--border">ПОДРОБНЕЕ</a>
                             <a href="javascript:void(0)" class="gallery-block__btn btn btn--gry btn--icon" style='--icon:url(&quot;/img/icons/44.svg&quot;)'>Оригинальные номера</a>
-                            <a href="{{ route('notepad', ['productSlug' => $product->sku]) }}" class="gallery-block__btn btn btn--icon" style='--icon:url(&quot;/img/icons/03.svg&quot;)'>Блокнот</a>
+                            @if(auth()->check())
+                                <a href="{{ route('notepad', ['productSlug' => $product->sku]) }}" class="gallery-block__btn btn btn--icon" style='--icon:url(&quot;/img/icons/03.svg&quot;)'>Блокнот</a>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -328,121 +331,124 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="notebook__table table-block">
-                            <div class="table-block__title">Замены</div>
-                            <div class="table-block__scroll">
-                                <div class="table-block__items">
-                                    <div class="table-block__item table-block__item--head">
-                                        <div class="table-block__row table-block__row--twelve">
-                                            <div class="table-block__column">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">
-                                                        ID товара</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">Производитель</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column ">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">Артикул</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column table-block__column--big">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">Название</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">наличие</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">склад</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">Дата отгрузки</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">ЦЕНА, ₽</div>
-                                                </div>
-                                            </div>
-                                            <div class="table-block__column">
-                                                <div class="table-block__info">
-                                                    <div class="table-block__category">Заказ</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @foreach($products->where('type', 'substitute') as $product)
-                                        <div class="table-block__item table-block__item--color" style='--color: #ECEEF2'>
+                        @if($products->where('type', 'substitute')->isNotEmpty())
+                            <div class="notebook__table table-block">
+                                <div class="table-block__title">Замены</div>
+                                <div class="table-block__scroll">
+                                    <div class="table-block__items">
+                                        <div class="table-block__item table-block__item--head">
                                             <div class="table-block__row table-block__row--twelve">
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <a href="{{ route('product.show', $product['sku']) }}" class="table-block__text">{{ $product['id'] }}</a>
+                                                        <div class="table-block__category">
+                                                            ID товара</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">{{ $product['manufacturer']->name }}</div>
+                                                        <div class="table-block__category">Производитель</div>
                                                     </div>
                                                 </div>
-                                                <div class="table-block__column">
+                                                <div class="table-block__column ">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">{{ $product['sku'] }}</div>
+                                                        <div class="table-block__category">Артикул</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column table-block__column--big">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">{{ $product['name'] }}</div>
-                                                        @if($product['minOrderQuantity'] > 1)
-                                                            <div class="table-block__attention">минимальный заказ от 10 шт.</div>
-                                                        @endif
+                                                        <div class="table-block__category">Название</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">{{ $product['quantity'] }}
-                                                        </div>
+                                                        <div class="table-block__category">наличие</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">{{ $product['warehouse']->cleanName }}
-                                                        </div>
+                                                        <div class="table-block__category">склад</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">12.09.2025
-                                                        </div>
+                                                        <div class="table-block__category">Дата отгрузки</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <div class="table-block__text">{{ $product['price'] }}
-                                                        </div>
+                                                        <div class="table-block__category">ЦЕНА, ₽</div>
                                                     </div>
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        <a wire:click="addToCart({{ $product['warehouseProduct'] }})" href="javascript:void(0)" class="table-block__basket" style='--icon:url(&quot;/img/icons/45.svg&quot;)'></a>
+                                                        <div class="table-block__category">Заказ</div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
+                                        @foreach($products->where('type', 'substitute') as $product)
+                                            <div class="table-block__item table-block__item--color" style='--color: #ECEEF2'>
+                                                <div class="table-block__row table-block__row--twelve">
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <a href="{{ route('product.show', $product['sku']) }}" class="table-block__text">{{ $product['id'] }}</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <div class="table-block__text">{{ $product['manufacturer']->name }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <div class="table-block__text">{{ $product['sku'] }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column table-block__column--big">
+                                                        <div class="table-block__info">
+                                                            <div class="table-block__text">{{ $product['name'] }}</div>
+                                                            @if($product['minOrderQuantity'] > 1)
+                                                                <div class="table-block__attention">минимальный заказ от 10 шт.</div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <div class="table-block__text">{{ $product['quantity'] }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <div class="table-block__text">{{ $product['warehouse']->cleanName }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <div class="table-block__text">12.09.2025
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <div class="table-block__text">{{ $product['price'] }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-block__column">
+                                                        <div class="table-block__info">
+                                                            <a wire:click="addToCart({{ $product['warehouseProduct'] }})" href="javascript:void(0)" class="table-block__basket" style='--icon:url(&quot;/img/icons/45.svg&quot;)'></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
+
                     </div>
                 </div>
             </div>

@@ -238,7 +238,7 @@ class CartPage extends Component
 
             $this->cart->cartItems()->create([
                 'warehouse_product_id' => $warehouseProduct->id,
-                'price' => $productPrice->cleanPrice,
+                'price' => $productPrice->price,
                 'quantity' => $this->qtyInput,
             ]);
         }

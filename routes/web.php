@@ -13,6 +13,7 @@ use App\Livewire\Pages\Multi\Order\UpdateOrderPage;
 use App\Livewire\Pages\Multi\Post\PostPage;
 use App\Livewire\Pages\Multi\Post\PostsPage;
 use App\Livewire\Pages\Multi\Profile\CabinetPage;
+use App\Livewire\Pages\Multi\Profile\InfoPage;
 use App\Livewire\Pages\Multi\Refund\CreateRefundPage;
 use App\Livewire\Pages\Multi\Refund\RefundPage;
 use App\Livewire\Pages\Multi\Refund\RefundsPage;
@@ -43,6 +44,7 @@ Route::middleware(['web', 'guest'])->prefix('popup')->group(function () {
 Route::middleware(['web', 'auth'])->group(function () {
     // Личный кабинет
     Route::get('/cabinet', CabinetPage::class)->name('cabinet');
+    Route::get('/info',    InfoPage::class)->name('info');
     Route::get('/basket', CartPage::class)->name('basket');
 
     // Заказы

@@ -7,12 +7,14 @@ use App\Filament\Resources\Vacancies\Pages\EditVacancy;
 use App\Filament\Resources\Vacancies\Pages\ListVacancies;
 use App\Filament\Resources\Vacancies\Schemas\VacancyForm;
 use App\Filament\Resources\Vacancies\Tables\VacanciesTable;
+use App\Models\NavigationOrder;
 use App\Models\Vacancy;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class VacancyResource extends Resource
@@ -23,6 +25,20 @@ class VacancyResource extends Resource
     protected static ?string $pluralModelLabel = 'Вакансии';
     protected static string|null|UnitEnum $navigationGroup = 'Наполнение';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(Str::camel(strtolower(static::getSlug()))));
+    }
+
 
     public static function form(Schema $schema): Schema
     {

@@ -18,11 +18,11 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('warehouse_id')->nullable()->constrained()->nullOnDelete();
 
-            $table->string('product_name'); // Название товар
-            $table->string('product_sku'); // Артику
-            $table->string('product_oem')->nullable(); // OEM номе
-            $table->unsignedBigInteger('unit_price'); // Цена за единиц
-            $table->unsignedBigInteger('total_amount'); // Сумма за позици
+            $table->string('product_name');
+            $table->string('product_sku');
+            $table->string('product_oem')->nullable();
+            $table->unsignedBigInteger('unit_price');
+            $table->unsignedBigInteger('total_amount');
             $table->unsignedInteger('quantity');
 
             $table->timestamps();

@@ -8,11 +8,13 @@ use App\Filament\Resources\ManufactureViews\Pages\ListManufactureViews;
 use App\Filament\Resources\ManufactureViews\Schemas\ManufactureViewForm;
 use App\Filament\Resources\ManufactureViews\Tables\ManufactureViewsTable;
 use App\Models\ManufacturerView;
+use App\Models\NavigationOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class ManufactureViewResource extends Resource
@@ -24,6 +26,19 @@ class ManufactureViewResource extends Resource
     protected static ?string $pluralModelLabel = 'Просмотры категорий';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(Str::camel(strtolower(static::getSlug()))));
+    }
+
 
     public static function form(Schema $schema): Schema
     {

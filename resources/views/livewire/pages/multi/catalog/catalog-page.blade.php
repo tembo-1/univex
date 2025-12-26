@@ -350,7 +350,7 @@
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        @if(!$product->productSubstitutions->isEmpty())
+                                                        @if(!$product->availableSubstitutions->isEmpty())
                                                             <a href="{{ route('product.show', $product->sku) }}" class="table-block__btn" style='--icon:url(&quot;/img/icons/39.svg&quot;)'></a>
                                                         @endif
                                                     </div>
@@ -382,7 +382,7 @@
                                                 </div>
                                                 <div class="table-block__column">
                                                     <div class="table-block__info">
-                                                        @if(!$product->productSubstitutions->isEmpty())
+                                                        @if(!$product->availableSubstitutions->isEmpty())
                                                             <a href="{{ route('product.show', $product->sku) }}" class="table-block__btn" style='--icon:url(&quot;/img/icons/39.svg&quot;)'></a>
                                                         @endif
                                                     </div>

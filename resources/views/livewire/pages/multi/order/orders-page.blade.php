@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="notebook__constructor">
-                <form action="#" class="notebook__constructor-form form" data-one-select>
+                <form wire:ignore class="notebook__constructor-form form" data-one-select>
                     <div class="form__row">
                         <div class="form__column">
                             <div class="form__column-title">ПОКАЗАТЬ СТРОК:</div>
@@ -75,8 +75,8 @@
                             <div class="form__column-title">Сортировать:</div>
                             <div class="form__column-items form__column-items--two">
                                 <div class="form__column-item">
-                                    <div wire:ignore class="form__column-select">
-                                        <select name="form[]" class="form" id="status-select" name="status">
+                                    <div  class="form__column-select">
+                                        <select id="status-select" name="status" class="form">
                                             @foreach($statuses as $status)
                                                 <option value="{{ $status->id }}">{{ $status->name }}</option>
                                             @endforeach
@@ -85,8 +85,8 @@
                                     </div>
                                 </div>
                                 <div class="form__column-item">
-                                    <div wire:ignore class="form__column-select">
-                                        <select name="form[]" class="form" id="period-select" name="period">
+                                    <div class="form__column-select">
+                                        <select id="period-select" name="period" class="form">
                                             <option value="1">За день</option>
                                             <option value="2">За неделю</option>
                                             <option value="3">За месяц</option>
@@ -242,26 +242,12 @@
 
     <script>
         document.addEventListener("selectCallback", function(e) {
-
-            // Обрабатываем оба селекта
             const statusSelect = document.getElementById('status-select');
             const periodSelect = document.getElementById('period-select');
 
-            if (statusSelect) {
-                if (statusSelect.value == 'Статус') {
-                    @this.set('status', '');
-                } else {
-                    @this.set('status', statusSelect.value);
-                }
-            }
-
-            if (periodSelect) {
-                if (periodSelect.value == 'Дата создания') {
-                    @this.set('period', '');
-                } else {
-                    @this.set('period', periodSelect.value);
-                }
-            }
+            // ✅ ТОЧНО КАК В БЛОКНОТЕ - БЕЗ проверок!
+            if (statusSelect) @this.set('status', statusSelect.value);
+            if (periodSelect) @this.set('period', periodSelect.value);
         });
     </script>
 </div>

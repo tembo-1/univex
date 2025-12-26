@@ -8,6 +8,7 @@ use App\Filament\Resources\Employees\Pages\ListEmployees;
 use App\Filament\Resources\Employees\Schemas\EmployeeForm;
 use App\Filament\Resources\Employees\Tables\EmployeesTable;
 use App\Models\Employee;
+use App\Models\NavigationOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -24,6 +25,14 @@ class EmployeeResource extends Resource
     protected static ?string $navigationLabel = 'Менеджеры';
     protected static ?string $modelLabel = 'Менеджера';
     protected static ?string $pluralModelLabel = 'Менеджеры';
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();

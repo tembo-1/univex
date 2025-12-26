@@ -9,11 +9,13 @@ use App\Filament\Resources\Manufacturers\RelationManagers\ProductsRelationManage
 use App\Filament\Resources\Manufacturers\Schemas\ManufacturerForm;
 use App\Filament\Resources\Manufacturers\Tables\ManufacturersTable;
 use App\Models\Manufacturer;
+use App\Models\NavigationOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class ManufacturerResource extends Resource
@@ -25,11 +27,19 @@ class ManufacturerResource extends Resource
     protected static string|null|UnitEnum $navigationGroup = 'Интернет торговля';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function canAccess(): bool
+    public static function getNavigationSort(): ?int
     {
-        return auth()->user()->hasRole('Администратор');
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
     }
 
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(Str::camel(strtolower(static::getSlug()))));
+    }
     public static function form(Schema $schema): Schema
     {
         return ManufacturerForm::configure($schema);

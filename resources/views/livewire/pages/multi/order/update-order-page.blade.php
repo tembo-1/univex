@@ -173,10 +173,10 @@
                     </h2>
                 </div>
                 <div class="quest-block__content">
-                    <form action="#" class="quest-block__form form">
+                    <form wire:submit.prevent="add()" class="quest-block__form form">
                         <div class="form__search">
                             <div class="form__search-input">
-                                <input autocomplete="off" type="text" name="form[]" data-error="Ошибка" placeholder="Артикул..." class="input">
+                                <input wire:model="skuInput" autocomplete="off" type="text" name="form[]" data-error="Ошибка" placeholder="Артикул..." class="input">
                             </div>
                             <button type="submit" class="form__search-icon" style='--icon:url(&quot;/img/icons/15.svg&quot;)'></button>
                         </div>
@@ -184,17 +184,17 @@
                             <div data-quantity class="form__quantity quantity">
                                 <button data-quantity-minus type="button" class="quantity__button quantity__button--minus"></button>
                                 <div class="quantity__input">
-                                    <input data-quantity-value autocomplete="off" type="number" name="form[]" value="180">
+                                    <input wire:model="qtyInput" data-quantity-value autocomplete="off" type="number" name="form[]" value="180">
                                 </div>
                                 <button data-quantity-plus type="button" class="quantity__button quantity__button--plus"></button>
                             </div>
-                            <a href="javascript:void(0)" class="form__basket" style='--icon:url(&quot;/img/icons/basket.svg&quot;)'></a>
+                            <button type="submit" class="form__basket" style='--icon:url(&quot;/img/icons/basket.svg&quot;)'></button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <form action="#" class="notebook__content">
+            <form wire:submit.prevent="submit()" class="notebook__content">
                 <div class="notebook__content-blocks"></div>
                 <div class="notebook__content-blocks">
                     <div class="notebook__content-block block-notebook">
@@ -203,13 +203,12 @@
                         </div>
                         <div class="block-notebook__inner">
                             <div class="block-notebook__info">
-                                <div class="block-notebook__textarea">
-													<textarea class="input" placeholder="Введите что-то..." data-autoheight data-autoheight-min="125" data-autoheight-max="300">Домофон не работает. Этаж 24 лифт не работает.
-										</textarea>
+                                <div class="block-notebook__textarea" wire:ignore>
+													<textarea wire:model="comment" class="input" placeholder="Введите что-то..." data-autoheight data-autoheight-min="125" data-autoheight-max="300">{{ $order->comment }}</textarea>
                                 </div>
                             </div>
+                            <button type="submit" class="block-notebook__btn btn btn--blue">Применить изменения</button>
                         </div>
-                        <button type="button" class="block-notebook__btn btn btn--blue">Оформить заказ</button>
                     </div>
                 </div>
             </form>

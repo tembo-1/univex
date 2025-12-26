@@ -294,29 +294,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="manufacturer__balance" data-watch data-watch-once data-da=".manufacturer__block, 992, 1">
-                    <div class="manufacturer__balance-title">Баланс</div>
-                    <div class="manufacturer__balance-items">
-                        <dl class="manufacturer__balance-item">
-                            <dt class="manufacturer__balance-category">Лимит</dt>
-                            <dd class="manufacturer__balance-value">10 000 ₽</dd>
-                        </dl>
-                        <dl class="manufacturer__balance-item">
-                            <dt class="manufacturer__balance-category">Остаток</dt>
-                            <dd class="manufacturer__balance-value">10 000 ₽</dd>
-                        </dl>
-                        <dl class="manufacturer__balance-item">
-                            <dt class="manufacturer__balance-category">Долг
-                            </dt>
-                            <dd class="manufacturer__balance-value">0 ₽</dd>
-                        </dl>
-                        <dl class="manufacturer__balance-item">
-                            <dt class="manufacturer__balance-category">Отсрочка
-                            </dt>
-                            <dd class="manufacturer__balance-value">10 дней</dd>
-                        </dl>
-                    </div>
-                </div>
+                @livewire('components.blocks.balance')
             </div>
 
         </div>

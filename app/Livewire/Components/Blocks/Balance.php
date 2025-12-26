@@ -6,11 +6,15 @@ use Livewire\Component;
 
 class Balance extends Component
 {
-    public $balance = 0;
     public $creditLimit = 0;
     public $debt = 0;
     public $availableBalance = 0;
     public $defermentDays = 0;
+
+    public function mount()
+    {
+        $this->defermentDays = auth()->user()->client->payment_terms;
+    }
 
     public function render()
     {

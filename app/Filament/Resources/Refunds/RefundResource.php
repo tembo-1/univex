@@ -8,12 +8,14 @@ use App\Filament\Resources\Refunds\Pages\ListRefunds;
 use App\Filament\Resources\Refunds\RelationManagers\RefundItemsRelationManager;
 use App\Filament\Resources\Refunds\Schemas\RefundForm;
 use App\Filament\Resources\Refunds\Tables\RefundsTable;
+use App\Models\NavigationOrder;
 use App\Models\Refund;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class RefundResource extends Resource
@@ -25,6 +27,21 @@ class RefundResource extends Resource
     protected static ?string $navigationLabel = 'Возвраты и претензии';
     protected static ?string $modelLabel = 'Возвраты и претензии';
     protected static ?string $pluralModelLabel = 'Возвраты и претензии';
+
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(Str::camel(strtolower(static::getSlug()))));
+    }
+
 
     public static function form(Schema $schema): Schema
     {

@@ -19,8 +19,10 @@ return new class extends Migration
             $table->unsignedInteger('position')->default(0);
             $table->timestamps();
 
-            $table->index('oem');
-            $table->index('position');
+            $table->index(['manufacturer_id', 'oem']);
+            $table->index('product_id');
+
+            $table->unique(['product_id', 'manufacturer_id', 'oem']);
         });
     }
 

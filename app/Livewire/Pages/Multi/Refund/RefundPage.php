@@ -80,7 +80,9 @@ class RefundPage extends Component
                 ]);
         }
 
-        collect($this->uploadedFiles['photos'])->map(function ($photo) {
+        $photos = $this->uploadedFiles['photos'] ?? [];
+
+        collect($photos)->map(function ($photo) {
             $content = Storage::disk('public')->get($photo['path']);
 
             $fileName = uniqid() . '_' . ($photo['original_name'] ?? 'photo.jpg');

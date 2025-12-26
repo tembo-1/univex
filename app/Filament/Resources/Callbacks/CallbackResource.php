@@ -6,6 +6,7 @@ use App\Filament\Resources\Callbacks\Pages\ListCallbacks;
 use App\Filament\Resources\Callbacks\Schemas\CallbackForm;
 use App\Filament\Resources\Callbacks\Tables\CallbacksTable;
 use App\Models\Callback;
+use App\Models\NavigationOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,6 +22,12 @@ class CallbackResource extends Resource
     protected static ?string $navigationLabel = 'Обратная связь';
     protected static ?string $modelLabel = 'Обратная связь';
     protected static ?string $pluralModelLabel = 'Обратная связь';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(static::getSlug()));
+    }
 
     public static function form(Schema $schema): Schema
     {

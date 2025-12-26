@@ -7,12 +7,14 @@ use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Filament\Resources\Posts\Schemas\PostForm;
 use App\Filament\Resources\Posts\Tables\PostsTable;
+use App\Models\NavigationOrder;
 use App\Models\Post;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class PostResource extends Resource
@@ -24,6 +26,20 @@ class PostResource extends Resource
     protected static ?string $modelLabel = 'Новость';
     protected static ?string $pluralModelLabel = 'Новости';
     protected static string|null|UnitEnum $navigationGroup = 'Наполнение';
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(Str::camel(strtolower(static::getSlug()))));
+    }
+
 
     public static function form(Schema $schema): Schema
     {

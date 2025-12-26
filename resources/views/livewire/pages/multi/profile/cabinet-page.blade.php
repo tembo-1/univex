@@ -1,23 +1,4 @@
 <div>
-    <div class="breadcrumb">
-        <ul class="breadcrumb__list breadcrumb__container">
-            <li class="breadcrumb__item" style='--icon:url(&quot;/img/icons/10.svg&quot;)'>
-								<span>
-									<a href="javascript:void(0)">
-										<span>
-											Главная
-										</span>
-									</a>
-								</span>
-            </li>
-            <li class="breadcrumb__item breadcrumb__item--active">
-								<span>
-									<span>Личный кабаинет</span>
-								</span>
-            </li>
-        </ul>
-    </div>
-
     <section class="cabinet  animate-block">
         <div class='cabinet__container'>
             <div class="cabinet__inner">
@@ -65,8 +46,8 @@
                                         <div class="agreement-cabinet__title">
                                             № Договора</div>
                                         <div class="agreement-cabinet__value">
-                                            <b>Договор № 12324</b>
-                                            <span>от 25 сентября 2025 г
+                                            <b>Договор № {{ $agreementNumber }}</b>
+                                            <span>от {{ $agreementDate }}
 															</span>
                                         </div>
                                     </div>

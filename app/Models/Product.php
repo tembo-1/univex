@@ -23,6 +23,14 @@ class Product extends Model
         return $this->hasMany(WarehouseProduct::class);
     }
 
+    public function availableSubstitutions()
+    {
+        return $this->hasMany(ProductSubstitution::class)
+            ->whereHas('substitute.warehouseProducts', function($query) {
+                $query->where('quantity', '>', 0);
+            });
+    }
+
     public function productPrices(): HasMany
     {
         return $this->hasMany(ProductPrice::class);
@@ -40,6 +48,8 @@ class Product extends Model
 
     public function getCleanPriceAttribute()
     {
+        return $this->productPrices()->first()->price / 100.0;
+
         if (auth()->check()) {
             return $this->productPrices()->first()->price / 100.0;
         } else {

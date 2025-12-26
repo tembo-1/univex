@@ -13,20 +13,24 @@ return new class extends Migration
     {
         Schema::create('client_ledger_entries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_ledger_entry_type_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('client_ledger_entry_type_id')->constrained();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
-            $table->string('entry_number'); // номер операции клиента
-            $table->timestamp('posting_date')->nullable(); // дата операции
-            $table->string('document_no')->nullable(); // номер документа
-            $table->timestamp('due_date')->nullable(); // дата оплаты (для счета)
-            $table->boolean('positive')->default(true); // положительная операция с точки зрения клиента
-            $table->boolean('open')->default(true); // открытая (не примененная) операция
-            $table->bigInteger('amount'); // сумма операции
-            $table->bigInteger('remaining_amount')->default(0); // остаточная сумма
-            $table->text('description')->nullable();
+            $table->string('entry_no');        // entryNo
+            $table->string('document_no');     // documentNo
+            $table->timestamp('posting_date')->nullable();  // postingDate
+            $table->timestamp('due_date')->nullable();      // dueDate
+            $table->boolean('positive')->default(true);     // positive
+            $table->boolean('open')->default(true);         // open
+            $table->bigInteger('amount');                   // amount
+            $table->bigInteger('remaining_amount');         // remainingAmount
 
             $table->timestamps();
+
+            // ✅ Уникальный ключ для синхронизации
+            $table->unique(['user_id', 'entry_no']);
+            $table->index(['user_id', 'open']);
+            $table->index('posting_date');
         });
     }
 

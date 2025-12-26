@@ -115,9 +115,6 @@
                                     </div>
                                 </div>
                                 <div class="form__column-item">
-                                    <button type="button" class="form__column-btn btn">Применить</button>
-                                </div>
-                                <div class="form__column-item">
                                     <a href="{{ route('refunds.create') }}" class="form__column-link btn btn--blue btn--icon" style='--icon:url(&quot;/img/icons/03.svg&quot;)'>Создать зааявку на возврат</a>
                                 </div>
                             </div>
@@ -158,7 +155,7 @@
                                 </div>
                                 <div class="table-block__column">
                                     <div class="table-block__info">
-                                        <div class="table-block__category">Причина возврата</div>
+                                        <div class="table-block__category">Причины возврата</div>
                                     </div>
                                 </div>
                                 <div class="table-block__column ">
@@ -193,12 +190,16 @@
                                     </div>
                                     <div class="table-block__column">
                                         <div class="table-block__info">
-                                            <div class="table-block__text">Производственный брак</div>
+                                            <div class="table-block__text">
+                                                @foreach($refund->refundItems as $item)
+                                                    {{ $item->refundType->name }}
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="table-block__column">
                                         <div class="table-block__info">
-                                            <div class="table-block__text">1 200</div>
+                                            <div class="table-block__text">{{ $refund->TotalAmount }}</div>
                                         </div>
                                     </div>
                                     <div class="table-block__column">
@@ -208,7 +209,7 @@
                                     </div>
                                     <div class="table-block__column">
                                         <div class="table-block__info">
-                                            <div class="table-block__text">Возврат зачтен, заявка проведена во взаиморасчетах</div>
+                                            <div class="table-block__text">{{ $refund->refundStatus->name }}</div>
                                         </div>
                                     </div>
                                     <div class="table-block__column">

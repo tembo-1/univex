@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class SearchView extends Model
 {
-    //
+    protected $guarded = [];
 }

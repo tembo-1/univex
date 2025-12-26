@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Multi\Profile;
 
 use App\Models\Employee;
 use App\Models\Notification;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,6 +18,8 @@ class CabinetPage extends Component
     public string $inn;
     public string $phone;
     public string $email;
+    public ?string $agreementNumber;
+    public ?string $agreementDate;
     public Employee $manager;
     public Collection $notifications;
 
@@ -30,6 +33,10 @@ class CabinetPage extends Component
         $this->phone    = auth()->user()->client->phone ?? '';
         $this->email    = auth()->user()->email;
         $this->manager = auth()->user()->client->employee;
+        $this->agreementNumber = auth()->user()->client->agreement_number;
+        $this->agreementDate = Carbon::parse(auth()->user()->client->agreement_date)->translatedFormat('j F Y') . ' г.';
+
+        $this->addBreadcrumbs();
 
         $this->loadNotifications();
     }
@@ -67,5 +74,17 @@ class CabinetPage extends Component
         return view('livewire.pages.multi.profile.cabinet-page', [
             'hasMore' => $this->hasMore,
         ]);
+    }
+
+    public function addBreadcrumbs(): void
+    {
+        $this->dispatch('updateBreadcrumbs',
+            items: [
+                [
+                    'label' => 'Личный кабинет',
+                    'active' => true
+                ],
+            ]
+        );
     }
 }

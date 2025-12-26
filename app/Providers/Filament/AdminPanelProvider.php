@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\Notifications\NotificationResource;
 use App\Livewire\MyWidget;
+use App\Models\NavigationOrder;
 use App\Models\Notification;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -32,6 +33,12 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->navigationGroups(
+                NavigationOrder::query()
+                ->orderBy('position')
+                ->pluck('name')
+                ->toArray()
+            )
             ->login()
             ->authGuard('admin')
             ->colors([
@@ -56,6 +63,10 @@ class AdminPanelProvider extends PanelProvider
         /* Webkit браузеры */
         *::-webkit-scrollbar {
             width: 6px;
+        }
+
+        .fi-fo-field-label[name="form.remember"] {
+            display: none !important;
         }
 
         *::-webkit-scrollbar-track {
@@ -101,7 +112,6 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(asset('img/menu/01.svg'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('img/icons/01.svg'))
-//            ->spa()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

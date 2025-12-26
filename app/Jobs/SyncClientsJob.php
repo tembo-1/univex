@@ -6,270 +6,112 @@ use App\Models\BankAccount;
 use App\Models\Client;
 use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Throwable;
 
 class SyncClientsJob implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $timeout = 300;
+    public int $timeout = 3600;
 
     public function handle()
     {
-        $userCodes = User::query()->whereNotNull('code')->pluck('code');
-
-        $this->processCreate($userCodes);
-        $this->processUpdate($userCodes);
-    }
-
-    private function processCreate(Collection $userCodes): void
-    {
-        $createExternalClients = DB::connection('external')
+        $externalClients = DB::connection('external')
             ->table('univexnav_customers')
-            ->whereNotIn('no', $userCodes)
             ->whereNotNull('inn')
-            ->whereNot('inn', '')
-            ->where('rejected', 0)
+            ->whereNotNull('bankName')
+            ->whereNot('bankName', '')
+            ->whereNotNull('bic')
+            ->whereNotNull('address')
+            ->whereNotNull('password')
             ->get();
 
-        $clients = $this->prepareToCreate($createExternalClients);
-
-        $this->create($clients);
-    }
-
-    private function processUpdate(Collection $userCodes): void
-    {
-        // 1. Предзагружаем ВСЕ данные за минимальное число запросов
-        $users = User::whereIn('code', $userCodes)
-            ->get(['id', 'code', 'email'])
-            ->keyBy('code');
-
-        if ($users->isEmpty()) return;
-
-        $clientIds = $users->pluck('id');
-        $clients = Client::whereIn('user_id', $clientIds)
-            ->get(['id', 'user_id', 'employee_id', 'client_status_id'])
-            ->keyBy('user_id');
-
-        $bankClientIds = $clients->pluck('id');
-        $bankAccounts = BankAccount::whereIn('client_id', $bankClientIds)
-            ->get(['id', 'client_id'])
-            ->keyBy('client_id');
-
-        // 2. Получаем данные из внешней БД только нужных полей
-        $updateExternalClients = DB::connection('external')
-            ->table('univexnav_customers')
-            ->whereIn('no', $userCodes)
-            ->get();
-
-        // 3. Обработка пачками по 100 записей
-        foreach ($updateExternalClients->chunk(100) as $chunk) {
-            $this->updateBatch($chunk, $users, $clients, $bankAccounts);
+        if ($externalClients->isEmpty()) {
+            return;
         }
-    }
 
-    private function updateBatch($chunk, $users, $clients, $bankAccounts): void
-    {
-        DB::transaction(function () use ($chunk, $users, $clients, $bankAccounts) {
-            foreach ($chunk as $external) {
-                try {
-                    $user = $users->get($external->no);
-                    if (!$user) continue;
+        $clientsData = $this->prepareClientsData($externalClients);
 
-                    // 1. Обновляем пользователя если email изменился
-                    if ($user->email !== $external->email) {
-                        User::where('id', $user->id)
-                            ->update(['email' => $external->email]);
-                    }
+        DB::transaction(function () use ($clientsData) {
+            $usersData = $clientsData->map(fn($data) => $data['user'])->toArray();
+            User::upsert($usersData, ['code'], ['email', 'password', 'updated_at']);
 
-                    // 2. Обновляем или создаем клиента
-                    $client = $clients->get($user->id);
+            $userIds = User::whereIn('code', $clientsData->pluck('user.code'))
+                ->pluck('id', 'code')
+                ->toArray();
 
-                    if ($client) {
-                        // Обновляем существующего клиента
-                        Client::where('id', $client->id)->update([
-                            'name' => $external->name,
-                            'short_name' => $external->name,
-                            'inn' => $external->inn,
-                            'kpp' => $external->kpp,
-                            'legal_address' => $external->address ?? null,
-                            'postal_address' => $external->addressFact ?? null,
-                            'head_name' => $external->head_name ?? null,
-                            'head_position' => $external->head_position ?? null,
-                            'first_name' => $external->first_name ?? null,
-                            'last_name' => $external->last_name ?? null,
-                            'middle_name' => $external->middle_name ?? null,
-                            'phone' => $external->phoneNo ?? null,
-                            'edo_operator' => $external->edo_operator ?? null,
-                            'edo_identifier' => $external->edoID ?? null,
-                            'updated_at' => now(),
-                        ]);
-                    } else {
-                        // Создаем нового клиента
-                        $newClient = Client::create([
-                            'user_id' => $user->id,
-                            'client_status_id' => 3,
-                            'employee_id' => null,
-                            'name' => $external->name,
-                            'short_name' => $external->name,
-                            'inn' => $external->inn,
-                            'kpp' => $external->kpp,
-                            'legal_address' => $external->address ?? null,
-                            'postal_address' => $external->addressFact ?? null,
-                            'head_name' => $external->head_name ?? null,
-                            'head_position' => $external->head_position ?? null,
-                            'first_name' => $external->first_name ?? null,
-                            'last_name' => $external->last_name ?? null,
-                            'middle_name' => $external->middle_name ?? null,
-                            'phone' => $external->phoneNo ?? null,
-                            'edo_operator' => $external->edo_operator ?? null,
-                            'edo_identifier' => $external->edoID ?? null,
-                        ]);
+            // 3. UPSERT Clients по user_id (уникальный!)
+            $clientsUpsert = $clientsData
+                ->filter(fn($data) => isset($userIds[$data['user']['code']]))
+                ->map(function ($data) use ($userIds) {
+                    $userId = $userIds[$data['user']['code']];
+                    return array_merge($data['client'], ['user_id' => $userId]);
+                })
+                ->toArray();
 
-                        $clients->put($user->id, $newClient);
-                    }
-
-                    // 3. Получаем актуальный ID клиента
-                    $currentClient = $clients->get($user->id);
-                    if (!$currentClient) continue;
-
-                    // 4. Банковский счет
-                    $hasBankData = !empty(trim($external->bankName ?? ''))
-                        || !empty(trim($external->bic ?? ''))
-                        || !empty(trim($external->rassSchet ?? ''));
-
-                    if ($hasBankData) {
-                        $bankAccount = $bankAccounts->get($currentClient->id);
-
-                        if ($bankAccount) {
-                            // Обновляем существующий счет
-                            BankAccount::where('id', $bankAccount->id)->update([
-                                'bank_name' => $this->normalizeEmptyToNull($external->bankName),
-                                'bik' => $this->normalizeEmptyToNull($external->bic),
-                                'payment_account' => $this->normalizeEmptyToNull($external->rassSchet),
-                                'correspondent_account' => $this->normalizeEmptyToNull($external->corrSchet),
-                                'updated_at' => now(),
-                            ]);
-                        } else {
-                            // Создаем новый счет
-                            BankAccount::create([
-                                'client_id' => $currentClient->id,
-                                'bank_name' => $this->normalizeEmptyToNull($external->bankName),
-                                'bik' => $this->normalizeEmptyToNull($external->bic),
-                                'payment_account' => $this->normalizeEmptyToNull($external->rassSchet),
-                                'correspondent_account' => $this->normalizeEmptyToNull($external->corrSchet),
-                            ]);
-                        }
-                    }
-
-                } catch (Throwable $e) {
-                    logger()->error('Ошибка обновления клиента', [
-                        'code' => $external->no,
-                        'error' => $e->getMessage()
-                    ]);
-                    // Продолжаем обработку остальных записей
-                }
+            if (!empty($clientsUpsert)) {
+                Client::upsert($clientsUpsert, ['user_id'], [
+                    'client_status_id', 'employee_id',
+                    'personal_discount', 'name', 'short_name',
+                    'inn', 'kpp', 'ogrn',
+                    'marketing_email', 'is_send_price_list', 'is_send_bulk_price_list',
+                    'payment_terms', 'is_store', 'discount_allow',
+                    'agreement_number', 'agreement_date',
+                    'legal_address', 'postal_address',
+                    'head_name', 'head_position',
+                    'first_name', 'last_name', 'middle_name',
+                    'phone', 'edo_operator', 'edo_identifier',
+                    'updated_at'
+                ]);
             }
+
+            // 4. UPSERT BankAccounts
+            $this->upsertBankAccounts($clientsData, $userIds);
         });
     }
 
-    private function normalizeEmptyToNull($value)
+    private function prepareClientsData($externalClients): Collection
     {
-        return !empty(trim($value ?? '')) ? trim($value) : null;
-    }
+        $managerCodes = $externalClients->pluck('managingpersonCode')->filter()->unique();
+        $employees = Employee::whereIn('code', $managerCodes)->pluck('id', 'code');
 
-    private function create(Collection $clients): void
-    {
-//        DB::transaction(function () use ($clients) {
-            foreach ($clients as $data) {
-                try {
-                    // 1. Создаем пользователя
-                    $user = User::query()
-                        ->create([
-                            'email' => $data['user']['email'],
-                            'password' => $data['user']['password'],
-                            'code' => $data['user']['code']
-                        ]);
+        return $externalClients
+            ->filter(fn($c) => $c->email)
+            ->map(function ($client) use ($employees) {
+                $status = $client->rejected ? 4 : 3;
 
-                    // 2. Создаем клиента
-                    $client = Client::query()
-                        ->create(array_merge(
-                            $data['client'],
-                            ['user_id' => $user->id]
-                        ));
-
-                    // 3. Создаем банковский счет только если есть данные
-                    if (!empty($data['bankAccount'])) {
-                        $hasBankData = collect($data['bankAccount'])
-                            ->filter(function ($value) {
-                                return !empty(trim($value ?? ''));
-                            })
-                            ->isNotEmpty();
-
-                        if ($hasBankData) {
-                            BankAccount::create(array_merge(
-                                $data['bankAccount'],
-                                ['client_id' => $client->id]
-                            ));
-                        }
-                    }
-
-                } catch (Throwable $exception) {
-                    continue;
-                }
-            }
-//        });
-    }
-
-    public function prepareToCreate(Collection $clients)
-    {
-        $managerCodes = $clients->pluck('managingpersonCode')
-            ->filter()
-            ->unique()
-            ->values()
-            ->toArray();
-
-        $employees = Employee::whereIn('code', $managerCodes)
-            ->get()
-            ->keyBy('code');
-
-        return $clients->map(function ($client) use ($employees) {
-            try {
-                $employeeId = isset($employees[$client->managingpersonCode])
-                    ? $employees[$client->managingpersonCode]->id
-                    : null;
-
-                if (!$client->email) {
-                    return [];
-                }
-
-                // Очищаем банковские данные
-                $bankAccount = array_filter([
-                    'bank_name' => $this->normalizeEmptyToNull($client->bankName),
-                    'bik' => $this->normalizeEmptyToNull($client->bic),
-                    'payment_account' => $this->normalizeEmptyToNull($client->rassSchet),
-                    'correspondent_account' => $this->normalizeEmptyToNull($client->corrSchet),
-                ], function ($value) {
-                    return $value !== null;
-                });
 
                 return [
                     'user' => [
+                        'code' => $client->no,
                         'email' => $client->email,
-                        'password' => $client->password,
-                        'code' => $client->no
+                        'password' => Hash::make($client->password)
                     ],
                     'client' => [
-                        'client_status_id' => 3,
-                        'employee_id' => $employeeId,
+                        'client_status_id' => $status,
+                        'employee_id' => $employees[$client->managingpersonCode] ?? null,
+                        'personal_discount' => $client->discount ?? 0.00,
                         'name' => $client->name,
                         'short_name' => $client->name,
                         'inn' => $client->inn,
                         'kpp' => $client->kpp,
+                        'ogrn' => $client->ogrn ?? null,
+                        'marketing_email' => $client->emailNewsletter,
+                        'is_send_price_list' => $client->sendPrice ?? 0,
+                        'is_send_bulk_price_list' => $client->sendManyPrice ?? 0,
+                        'payment_terms' => $client->paymentTerms,
+                        'is_store' => $client->onlineStore ?? 0,
+                        'discount_allow' => $client->salediscountAllow ?? 0,
+                        'agreement_number' => $client->agreementNo,
+                        'agreement_date' => $client->agreementDate ?? null,
                         'legal_address' => $client->address ?? null,
                         'postal_address' => $client->addressFact ?? null,
                         'head_name' => $client->head_name ?? null,
@@ -281,14 +123,60 @@ class SyncClientsJob implements ShouldQueue
                         'edo_operator' => $client->edo_operator ?? null,
                         'edo_identifier' => $client->edoID ?? null,
                     ],
-                    'bankAccount' => $bankAccount
+                    'bankAccount' => $this->prepareBankData($client)
                 ];
-            } catch (Throwable) {
-                return [];
-            }
-        })
+            });
+    }
+
+    private function prepareBankData($client): array  // ✅ Обязательный массив
+    {
+        return [
+            'bank_name' => $this->normalizeEmptyToNull($client->bankName),
+            'bik' => $this->normalizeEmptyToNull($client->bic),
+            'payment_account' => $this->normalizeEmptyToNull($client->rassSchet),
+            'correspondent_account' => $this->normalizeEmptyToNull($client->corrSchet),
+        ];
+    }
+
+
+    private function upsertBankAccounts(Collection $clientsData, array $userIds): void
+    {
+        $bankData = $clientsData
+            ->filter(fn($data) => isset($userIds[$data['user']['code']]))
+            ->map(function ($data) use ($userIds) {
+                $userId = $userIds[$data['user']['code']];
+                $clientId = Client::where('user_id', $userId)->value('id');
+
+                if (!$clientId) return null;
+
+                $bankAccount = $data['bankAccount'];
+
+                // ✅ Проверяем, есть ли хоть одно непустое поле
+                if (collect($bankAccount)->filter()->isEmpty()) {
+                    return null;
+                }
+
+                return array_merge($bankAccount, [
+                    'client_id' => $clientId,
+                    'is_default' => true
+                ]);
+            })
             ->filter()
             ->values()
-            ->unique('user.code');
+            ->toArray();
+
+        if (!empty($bankData)) {
+            BankAccount::upsert($bankData, ['client_id'], [
+                'bank_name', 'bik', 'payment_account',
+                'correspondent_account', 'is_default',
+                'updated_at'
+            ]);
+        }
+    }
+
+    private function normalizeEmptyToNull($value): ?string
+    {
+        $trimmed = trim($value ?? '');
+        return $trimmed !== '' ? $trimmed : null;
     }
 }

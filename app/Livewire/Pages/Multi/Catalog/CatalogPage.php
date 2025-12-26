@@ -3,7 +3,9 @@
 namespace App\Livewire\Pages\Multi\Catalog;
 
 use App\Models\Manufacturer;
+use App\Models\ManufacturerView;
 use App\Models\Product;
+use App\Models\SearchView;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -54,11 +56,16 @@ class CatalogPage extends Component
     public function applyFilters(): void
     {
         $query = Product::query()
-            ->with('manufacturer')
+            ->with(['manufacturer', 'productSubstitutions'])
             ->select(['id', 'name', 'manufacturer_id', 'sku', 'oem'])
             ->orderBy('id');
 
         if ($this->search) {
+            SearchView::query()->updateOrCreate(
+                ['query' => $this->search, 'page' => 'Каталог'],
+                ['count' => 1]
+            )->increment('count');
+
             $this->addToSearchHistory($this->search);
             $query->where(function($q) {
                 $q->where('name', 'like', $this->search . '%')
@@ -71,6 +78,12 @@ class CatalogPage extends Component
         }
 
         if (!empty($this->selectedManufacturers)) {
+            collect($this->selectedManufacturers)->each(function ($manufacturer) {
+                ManufacturerView::query()
+                    ->updateOrCreate(['manufacturer_id' => $manufacturer], ['views_count' => 0])
+                    ->increment('views_count');
+            });
+
             $query->whereIn('manufacturer_id', $this->selectedManufacturers);
         }
 
@@ -202,7 +215,7 @@ class CatalogPage extends Component
     public function loadProducts(): void
     {
         $this->products = Product::query()
-            ->with('manufacturer')
+            ->with(['manufacturer', 'productSubstitutions'])
             ->whereNot('product_warehouse_status_id', 3)
             ->limit($this->page * 30)
             ->get();

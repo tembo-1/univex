@@ -30,7 +30,7 @@
                                     <div class="form__block-checkbox checkbox">
                                         <input wire:model="method" id="czz_1" data-error="Ошибка" class="checkbox__input" type="radio" value="phone" name="form[]" data-validate checked>
                                         <label for="czz_1" class="checkbox__label">
-                                            <span class="checkbox__text checkbox__text--icon" style='--icon:url(&quot;/img/icons/74.svg&quot;)'>На мой номер</span>
+                                            <span class="checkbox__text checkbox__text--icon" style='--icon:url(&quot;/img/icons/74.svg&quot;)'>На телефон</span>
                                         </label>
                                     </div>
                                     <div class="form__block-checkbox checkbox">
@@ -42,7 +42,7 @@
                                     <div class="form__block-checkbox checkbox">
                                         <input wire:model="method" id="czz_3" data-error="Ошибка" class="checkbox__input" type="radio" value="whatsapp" name="form[]" data-validate>
                                         <label for="czz_3" class="checkbox__label">
-                                            <span class="checkbox__text checkbox__text--icon" style='--icon:url(&quot;/img/icons/76.svg&quot;)'>Watsapp</span>
+                                            <span class="checkbox__text checkbox__text--icon" style='--icon:url(&quot;/img/icons/76.svg&quot;)'>Whatsapp</span>
                                         </label>
                                     </div>
                                 </div>

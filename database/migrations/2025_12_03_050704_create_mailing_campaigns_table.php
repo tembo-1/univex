@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('mailing_status_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('mailing_type_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
 
             $table->string('name');                     // "Новогодняя распродажа 2024"
@@ -22,9 +23,7 @@ return new class extends Migration
             $table->text('content');                    // HTML контент
 
             $table->timestamp('scheduled_at')->nullable(); // Когда отправить
-            $table->timestamp('sent_at')->nullable();      // Когда начали отправку
-            $table->timestamp('completed_at')->nullable(); // Когда завершили
-            $table->boolean('send_to_all')->default(false);
+            $table->unsignedInteger('send_again_after')->nullable();
             $table->timestamps();
         });
     }

@@ -9,6 +9,7 @@ use App\Filament\Resources\Clients\Pages\ViewClient;
 use App\Filament\Resources\Clients\Schemas\ClientForm;
 use App\Filament\Resources\Clients\Tables\ClientsTable;
 use App\Models\Client;
+use App\Models\NavigationOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -25,6 +26,20 @@ class ClientResource extends Resource
     protected static ?string $navigationLabel = 'Организации';
     protected static ?string $modelLabel = 'Организации';
     protected static ?string $pluralModelLabel = 'Организации';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(static::getSlug()));
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
@@ -32,10 +47,6 @@ class ClientResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return static::getModel()::count() > 10 ? 'warning' : 'primary';
-    }
-    public static function canAccess(): bool
-    {
-        return auth()->user()->hasRole('Администратор');
     }
 
     public static function form(Schema $schema): Schema

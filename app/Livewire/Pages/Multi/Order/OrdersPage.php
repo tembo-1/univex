@@ -19,8 +19,8 @@ class OrdersPage extends Component
 
     #[Url]
     public string $search = '';
-    public $status;
-    public $period;
+    public $status = '';
+    public $period = '';
 
     public function mount()
     {
@@ -58,11 +58,11 @@ class OrdersPage extends Component
             });
         }
 
-        if ($this->status) {
+        if ($this->status and $this->status !== 'Статус') {
             $query->where('order_status_id', $this->status);
         }
 
-        if ($this->period) {
+        if ($this->period and $this->period != 'Дата создания') {
             switch ($this->period) {
                 case '1': $date = $date->subDay(); break;
                 case '2': $date = $date->subWeek(); break;

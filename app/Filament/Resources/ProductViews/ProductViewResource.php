@@ -7,12 +7,14 @@ use App\Filament\Resources\ProductViews\Pages\EditProductView;
 use App\Filament\Resources\ProductViews\Pages\ListProductViews;
 use App\Filament\Resources\ProductViews\Schemas\ProductViewForm;
 use App\Filament\Resources\ProductViews\Tables\ProductViewsTable;
+use App\Models\NavigationOrder;
 use App\Models\ProductView;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class ProductViewResource extends Resource
@@ -24,6 +26,21 @@ class ProductViewResource extends Resource
     protected static ?string $navigationLabel = 'Просмотры товаров';
     protected static ?string $modelLabel = 'Просмотры товаров';
     protected static ?string $pluralModelLabel = 'Просмотры товаров';
+
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(Str::camel(strtolower(static::getSlug()))));
+    }
+
 
     public static function form(Schema $schema): Schema
     {

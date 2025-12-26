@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Refunds\Schemas;
 
 use App\Models\RefundStatus;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -13,6 +14,7 @@ use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 
 class RefundForm
@@ -151,6 +153,37 @@ class RefundForm
                             ->schema([
                                 Livewire::make('components.blocks.refund-chat')
                                     ->key(fn ($record) => 'refund-chat-' . ($record?->id ?: 'new'))
+                                    ->columnSpanFull(),
+
+                                Placeholder::make('chat_photos')
+                                    ->label('Прикрепленные фото')
+                                    ->content(function ($get) {
+                                        $refundId = $get('../../id') ?? 1;
+                                        $files = Storage::disk('documents')->files("refunds/$refundId/photos");
+
+                                        if (empty($files)) {
+                                            return new HtmlString('<div class="text-gray-400 text-sm italic p-3 text-center">Нет фото</div>');
+                                        }
+
+                                        $html = '<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2" style="display: flex">';
+                                        foreach ($files as $file) {
+                                            $imageUrl = "http://localhost:3377/documents/$file";
+
+                                            $html .= '<a href="' . $imageUrl . '" target="_blank" class="group relative block w-full h-16 rounded-lg overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 bg-white border hover:border-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-400">';
+
+                                            $html .= '<img src="' . $imageUrl . '" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" style="height:200px"> ';
+
+                                            // ✅ Компактная подпись только на hover
+                                            $html .= '<div class="absolute inset-0 bg-gradient-to-t from-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-end p-1">';
+                                            $html .= '<span class="text-white text-xs truncate leading-tight">' . basename($file) . '</span>';
+                                            $html .= '</div>';
+
+                                            $html .= '</a>';
+                                        }
+                                        $html .= '</div>';
+
+                                        return new HtmlString($html);
+                                    })
                                     ->columnSpanFull(),
                             ]),
                     ])

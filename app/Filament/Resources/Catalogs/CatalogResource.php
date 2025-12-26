@@ -8,6 +8,7 @@ use App\Filament\Resources\Catalogs\Pages\ListCatalogs;
 use App\Filament\Resources\Catalogs\Schemas\CatalogForm;
 use App\Filament\Resources\Catalogs\Tables\CatalogsTable;
 use App\Models\Catalog;
+use App\Models\NavigationOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -24,6 +25,19 @@ class CatalogResource extends Resource
     protected static ?string $navigationLabel = 'Каталоги';
     protected static ?string $modelLabel = 'Каталог';
     protected static ?string $pluralModelLabel = 'Каталоги';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(static::getSlug()));
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
 
     public static function form(Schema $schema): Schema
     {

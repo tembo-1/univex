@@ -181,10 +181,15 @@
                                 </a>
                             </div>
                         </div>
-                        <a href="#" class="location__bottom-btn btn btn--icon btn--org" style='--icon:url("{{ asset('img/icons/03.svg') }}")'>Проложить маршрут</a>
+                        <a href="https://yandex.ru/maps/?rtext=~55.779324,37.581623"
+                           class="location__bottom-btn btn btn--icon btn--org"
+                           style='--icon:url("{{ asset('img/icons/03.svg') }}")'
+                           target="_blank">
+                            Проложить маршрут
+                        </a>
                     </div>
                 </div>
-                <div class="location__map map fade-up" data-watch data-watch-once id="map" data-key="Ваш API ключ" data-center="[55.779324, 37.581623]" data-icon="Ссылка на иконку"></div>
+                <div class="location__map map fade-up" data-watch data-watch-once id="map" data-key="9dd2c213-fb03-4c1d-880f-1f03fbeee8ca" data-center="[55.779324, 37.581623]" data-icon="Ссылка на иконку"></div>
             </div>
         </div>
     </section>

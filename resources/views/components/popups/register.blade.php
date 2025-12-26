@@ -7,6 +7,9 @@
                     <div class="popup__title">Регистрация</div>
                 </div>
                 <div data-tabs class="popup__tabs tabs">
+                    <nav data-tabs-titles class="tabs__navigation">
+                        <button type="button" class="tabs__title _tab-active">Юридическое лицо</button>
+                    </nav>
                     <div data-tabs-body class="tabs__content">
                         <div class="tabs__body">
                             <div class="tabs__quest quest-block quest-block--alt">

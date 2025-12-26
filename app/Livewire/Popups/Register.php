@@ -61,7 +61,7 @@ class Register extends Component
                 $seconds = RateLimiter::availableIn($key);
                 $this->dispatch('showToast',
                     type: 'error',
-                    message: "Лимит: 5 запроса в минуту. Следующий через $seconds сек."
+                    message: "Лимит: 5 запросов в минуту. Следующий через $seconds сек."
                 );
                 return;
             }
@@ -77,6 +77,12 @@ class Register extends Component
                 $this->postalAddress    = data_get($info, '0.data.address.value');
                 $this->headName         = data_get($info, '0.data.management.name');
                 $this->headPosition     = data_get($info, '0.data.management.post');
+
+                $this->dispatch('showToast',
+                    type: 'success',
+                    message: "Информация по ИНН найдена"
+                );
+
             } else {
                 $this->dispatch('showToast',
                     type: 'error',
@@ -197,10 +203,12 @@ class Register extends Component
             'email.required' => 'Email обязателен',
             'email.email' => 'Введите корректный email адрес',
 
+            // Согласие
             'privacyPolicy.required' => 'Необходимо согласие с обработкой персональных данных',
             'privacyPolicy.accepted' => 'Необходимо согласие с обработкой персональных данных',
         ]);
 
+        // Если валидация прошла успешно, сохраняем данные
         $this->saveData();
     }
 

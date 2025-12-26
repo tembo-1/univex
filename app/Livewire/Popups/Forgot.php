@@ -22,7 +22,7 @@ class Forgot extends Component
 
         $key = 'forgot:' . request()->ip();
         $maxAttempts = 1;
-        $decaySeconds = 60 * 30;
+        $decaySeconds = 60;
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
@@ -58,9 +58,6 @@ class Forgot extends Component
             ->update([
                 'password' => $password
             ]);
-
-
-
     }
 
     public function render()

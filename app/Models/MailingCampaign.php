@@ -15,6 +15,11 @@ class MailingCampaign extends Model
         return $this->belongsTo(MailingStatus::class);
     }
 
+    public function mailingType(): BelongsTo
+    {
+        return $this->belongsTo(MailingType::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

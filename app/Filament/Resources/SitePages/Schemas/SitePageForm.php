@@ -10,6 +10,8 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\EditRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Section;
@@ -31,11 +33,26 @@ class SitePageForm
                                         TextInput::make('name')
                                             ->label('Название страницы')
                                             ->required()
-                                            ->maxLength(255),
+                                            ->maxLength(255)
+                                            ->live(onBlur: true) // или ->live()
+                                            ->afterStateUpdated(function ($state, $set) {
+                                                if (empty($state)) return;
+
+                                                // Генерируем slug из name
+                                                $slug = str($state)
+                                                    ->slug()
+                                                    ->lower()
+                                                    ->toString();
+
+                                                $set('slug', $slug);
+                                                $set('url', $slug);
+                                            }),
 
                                         TextInput::make('slug')
                                             ->label('URL страницы')
+                                            ->disabled()
                                             ->required()
+                                            ->hidden()
                                             ->unique(ignoreRecord: true)
                                             ->helperText('Только латинские буквы и дефисы'),
                                     ]),
@@ -74,6 +91,8 @@ class SitePageForm
                                     ->addable(false)
                                     ->collapsible()
                                     ->deletable(false)
+                                    ->defaultItems(1)
+                                    ->dehydrated(fn ($livewire) => $livewire instanceof CreateRecord)
                                     ->label('Блоки страницы')
                                     ->schema([
                                         Grid::make(2)
@@ -88,15 +107,16 @@ class SitePageForm
                                         // Динамические элементы блока
                                         Repeater::make('Элементы')
                                             ->relationship('siteElements')
-                                            ->addable(false)
-                                            ->deletable(false)
+                                            ->addable(fn ($livewire) => $livewire instanceof CreateRecord)
+                                            ->deletable(fn ($livewire) => $livewire instanceof CreateRecord)
+                                            ->dehydrated(fn ($livewire) => $livewire instanceof CreateRecord)
                                             ->label('')
                                             ->schema([
                                                 Grid::make(2)
                                                     ->schema([
                                                         TextInput::make('name')
                                                             ->label('Название элемента')
-                                                            ->disabled()
+                                                            ->disabled(fn ($livewire) => $livewire instanceof EditRecord)
                                                             ->required()
                                                             ->maxLength(255),
 
@@ -127,6 +147,45 @@ class SitePageForm
         return Grid::make(1)
             ->schema(function ($get, $set) {
                 $typeId = $get('site_element_type_id');
+
+                $livewire = app('livewire')->current();
+                $isEdit = $livewire instanceof CreateRecord;
+
+                // Если мы в режиме редактирования и тип не выбран, показываем text по умолчанию
+                if ($isEdit && !$typeId) {
+                    return [
+                        RichEditor::make('content')
+                            ->label('Содержание')
+                            ->required()
+                            ->maxLength(5000)
+                            ->extraInputAttributes(['style' => 'min-height: 200px;'])
+                            ->toolbarButtons([
+                                'bold', 'italic', 'underline', 'strike',
+                                'h2', 'h3',
+                                'blockquote', 'codeBlock',
+                                'bulletList', 'orderedList',
+                                'link', 'attachFiles',
+                                'undo', 'redo',
+                            ])
+                            // Преобразуем массив в строку при сохранении
+                            ->dehydrateStateUsing(fn ($state): string =>
+                            is_array($state) ? ($state[0] ?? '') : (string) $state
+                            )
+                            // Обрабатываем загруженное состояние
+                            ->afterStateHydrated(function (RichEditor $component, $state) {
+                                // Если state это массив, берем первый элемент
+                                if (is_array($state)) {
+                                    $component->state($state[0] ?? '');
+                                } else {
+                                    $component->state((string) $state);
+                                }
+                            })
+                            ->fileAttachmentsDisk('documents')
+                            ->fileAttachmentsDirectory('site-element-images')
+                            ->fileAttachmentsVisibility('public')
+                            ->columnSpanFull()
+                    ];
+                }
 
                 if (!$typeId) {
                     return [];

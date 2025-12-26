@@ -12,6 +12,7 @@
         "asmit/filament-upload": "^1.1",
         "filament/filament": "^4.0",
         "filament/notifications": "^4.1",
+        "geoip2/geoip2": "^3.3",
         "laravel/framework": "^12.0",
         "laravel/horizon": "^5.41",
         "laravel/scout": "^10.22",
@@ -22,7 +23,8 @@
         "movemoveapp/laravel-dadata": "^1.0",
         "phpoffice/phpword": "^1.4",
         "predis/predis": "^3.3",
-        "spatie/laravel-permission": "^6.21"
+        "spatie/laravel-permission": "^6.21",
+        "torann/geoip": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",

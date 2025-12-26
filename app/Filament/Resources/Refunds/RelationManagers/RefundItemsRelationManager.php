@@ -36,7 +36,7 @@ class RefundItemsRelationManager extends RelationManager
                     ->label('Артикул'),
                 TextColumn::make('orderItem.product_oem')
                     ->label('Артикул производителя'),
-                TextColumn::make('orderItem.unit_price')
+                TextColumn::make('orderItem.unitPriceRub')
                     ->label('Цена за единицу')
                     ->money('RUB'),
                 TextColumn::make('quantity')

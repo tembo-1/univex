@@ -29,9 +29,6 @@ class RolesTable
                     ->counts('users')
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
             ->recordActions([
                 EditAction::make(),
             ])

@@ -12,7 +12,7 @@ class ManufacturersPage extends Component
     public $search = '';
 
     public $page = 1;
-    public $perPage = 12;
+    public $perPage = 24;
     public $loadedManufacturers = [];
 
     public function mount()

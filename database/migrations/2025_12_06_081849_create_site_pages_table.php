@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('url')->nullable();
             $table->string('title')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->string('meta_description')->nullable();
             $table->string('meta_keywords')->nullable();
             $table->timestamps();

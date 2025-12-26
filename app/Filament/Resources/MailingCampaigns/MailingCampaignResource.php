@@ -8,11 +8,13 @@ use App\Filament\Resources\MailingCampaigns\Pages\ListMailingCampaigns;
 use App\Filament\Resources\MailingCampaigns\Schemas\MailingCampaignForm;
 use App\Filament\Resources\MailingCampaigns\Tables\MailingCampaignsTable;
 use App\Models\MailingCampaign;
+use App\Models\NavigationOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class MailingCampaignResource extends Resource
@@ -26,6 +28,20 @@ class MailingCampaignResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'MailingCampaign';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Администратор')
+            || auth()->user()?->getPermissionsViaRoles()?->pluck('name')->contains(strtolower(Str::camel(strtolower(static::getSlug()))));
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        $order = NavigationOrder::query()->firstWhere('slug', static::getSlug());
+
+        return $order->position ?? 0;
+    }
+
 
     public static function form(Schema $schema): Schema
     {
